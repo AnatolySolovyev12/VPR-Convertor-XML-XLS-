@@ -977,5 +977,7 @@ void Table::writeCurrentinOtherFile()
     statusBar->showMessage("New file with parameters was save.", 2000);
 }
 
+//git test 1
+
 
 
