@@ -1,0 +1,981 @@
+#include "Table.h"
+#include <QInputDialog>
+#include <QElapsedTimer>
+#include <QAxWidget>
+#include <QTime>
+#include <QMultiHash>
+#include <QFile>
+
+#include <QPair.h>
+
+QTextStream out(stdout);
+
+Table::Table(QWidget* parent)
+    : QWidget(parent) {
+
+    QHBoxLayout* Hbox = new QHBoxLayout(this);
+    Vbox = new QVBoxLayout();
+    QVBoxLayout* VboxButtons = new QVBoxLayout();
+
+    VPR = new QPushButton("VPR", this);
+   // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(VPR, &QPushButton::clicked, this, &Table::myVPR);
+
+    donor = new QPushButton("AddDonor", this);
+    //donor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(donor, &QPushButton::clicked, this, &Table::addDonor);
+
+    recepient = new QPushButton("AddRecepient", this);
+   // recepient->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(recepient, &QPushButton::clicked, this, &Table::addRecepient);
+
+    loadConfig = new QPushButton("Load config", this);
+    // recepient->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(loadConfig, &QPushButton::clicked, this, &Table::readFileConfig);
+
+    paramMenu = new QPushButton("Selecting Options", this);
+   // paramMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    pm = new QMenu(paramMenu);
+
+    pm->addAction("&Where find in Donor?", this, &Table::whatFind);
+    pm->addAction("&What start Row find in Donor?", this, &Table::RowDoctor);
+    pm->addAction("&Where find in Recepient?", this, &Table::whereFind);
+    pm->addAction("&What start Row find in Recepient?", this, &Table::RowRecepient);
+    pm->addAction("&Where Day/Night of Donor?", this, &Table::whereDayNightDonor);
+    pm->addAction("&Where Day/Night of Recepient?", this, &Table::whereDayNightRecepient);
+    pm->addAction("&What to insert in Donor?", this, &Table::whatToInsert);
+    pm->addAction("&Where to insert in Recepient?", this, &Table::whereToInsert);
+
+    paramMenu->setMenu(pm);
+
+    
+    savedConfig = new QPushButton("Save config", this);
+    saveMenu = new QMenu(savedConfig);
+
+    saveMenu->addAction("&Save current parameter as default", this, &Table::writeCurrent);
+    saveMenu->addAction("&Save current parameter in other file", this, &Table::writeCurrentinOtherFile);
+
+    savedConfig->setMenu(saveMenu);
+    
+
+    statusBar = new QStatusBar();
+    statusBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    cb = new QCheckBox("Refresh Recepient table after VPR", this);
+    connect(cb, &QCheckBox::stateChanged, this, &Table::checkStateForRefresh);
+
+    dayNightCheck = new QCheckBox("Use Day/Night parameters", this);
+    connect(dayNightCheck, &QCheckBox::stateChanged, this, &Table::checkDayNight);
+
+    VboxButtons->setSpacing(10); // расстояние между виджетами внутри вертикального бокса
+    VboxButtons->addStretch(1); // равноудаляет от краёв или типо того
+    VboxButtons->addWidget(cb);
+    VboxButtons->addWidget(dayNightCheck);
+    VboxButtons->addWidget(VPR);
+    VboxButtons->addWidget(donor);
+    VboxButtons->addWidget(recepient);
+    VboxButtons->addWidget(loadConfig);
+    VboxButtons->addWidget(savedConfig);
+    VboxButtons->addWidget(paramMenu);
+
+    VboxButtons->addWidget(statusBar);
+    VboxButtons->addStretch(1); // равноудаляет от краёв или типо того
+
+    Hbox->addLayout(Vbox, Qt::AlignRight);
+    Hbox->addSpacing(10);
+    Hbox->addLayout(VboxButtons, Qt::AlignLeft);
+
+    readDefaultFileConfig();
+}
+
+
+
+void Table::myVPR()
+{
+    if (!Table::readyDonor || !Table::readyRecepient)
+    {
+        statusBar->showMessage("Add Donor first, recepient second!", 2000);
+
+        return;
+    }
+
+    excelDonor = new QAxObject("Excel.Application", 0);// использование самого Excel. При использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. В общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
+    workbooksDonor = excelDonor->querySubObject("Workbooks"); // выбираем книгу
+    workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // выбираем файл с каким работать
+    sheetsDonor = workbookDonor->querySubObject("Worksheets"); // обращаемся к листу
+    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor); // выбираем номер листа
+
+    excelRecepient = new QAxObject("Excel.Application", 0);
+    workbooksRecepient = excelRecepient->querySubObject("Workbooks");
+    workbookRecepient = workbooksRecepient->querySubObject("Open(const QString&)", addFileRecepient);
+    sheetsRecepient = workbookRecepient->querySubObject("Worksheets");
+    sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);
+
+    QElapsedTimer timer;
+
+    int countTimer = 0;
+
+    timer.start();
+
+    QAxObject* copy = nullptr;
+    QAxObject* compareDonor = nullptr;
+    QAxObject* dayDonor = nullptr;
+    QAxObject* compareRecepient = nullptr;
+    QAxObject* paste = nullptr;
+    QAxObject* dayRecepient = nullptr;
+
+    if (dayNightParametres)
+    {
+        // QList<vprStruct> tabelDonorFindAndDay;
+
+        QMultiHash<QPair<QString, QString>, QVariant> tabelDonorFindAndDay; // профита нет
+
+        for (int counter = memberRowFromFindDonor; counter <= countRowsDonor; counter++)
+        {
+            compareDonor = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatFind);
+            dayDonor = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberwhereDayNightDonor);
+            copy = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatToInsert);
+            
+           // QVariant val1 = compareDonor->property("Value").toString();
+           // QVariant val2 = dayDonor->property("Value").toString();
+           // QVariant val3 = copy->property("Value").toString();
+           // vprStruct some = { val1, val2, val3 };
+           // tabelDonorFindAndDay.append(some);
+            tabelDonorFindAndDay.insert(QPair<QString, QString>{compareDonor->property("Value").toString(), dayDonor->property("Value").toString()}, copy->property("Value").toString());
+            delete compareDonor;
+            delete copy;
+            delete dayDonor;
+            
+        }
+
+        countTimer = timer.elapsed();
+        out << "Creating an array finished in = " << (double)countTimer / 1000 << " sec" << Qt::endl;
+
+        workbookDonor->dynamicCall("Close()"); 
+        excelDonor->dynamicCall("Quit()");
+        delete workbookDonor;
+        delete excelDonor;
+
+        // QListIterator<vprStruct> it(tabelDonorFindAndDay);
+
+        QMultiHashIterator<QPair<QString, QString>, QVariant> it(tabelDonorFindAndDay);
+
+        int countDoingIterationForTime = 0;
+
+        for (int counter = memberRowFromFindRecepient; counter <= countRowsRecepient; counter++)
+        {
+
+            compareRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereFind);
+            paste = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereToInsert);
+            dayRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberwhereDayNightRecepient);
+
+            while (it.hasNext())
+            {
+               it.next();
+
+               //vprStruct temporary = it.next();
+
+               //if ((temporary.whatFindStruct == compareRecepient->property("Value").toString()) && (temporary.dayNightStruct == dayRecepient->property("Value").toString())) 
+
+                if ((it.key().first == compareRecepient->property("Value").toString()) && (it.key().second == dayRecepient->property("Value").toString())) // надо сравнивать QVariant с переводом в QString иначе не сравнивает.
+                {
+                    ++countDoingIterationForTime;
+
+                    paste->dynamicCall("SetValue(String)", it.value().toDouble());
+
+                   // tabelDonorFindAndDay.remove(it.key(), it.value()); // удаление записей из хэша (непомогло ускорить процесс)
+
+                    qDebug() << "DONE WITH PARAM" << counter; // tabelDonorFindAndDay.count(); - для подсчёта остатков после удаления из хэша записей
+
+                    delete compareRecepient;
+                    delete paste;
+                    delete dayRecepient;
+
+                    break;
+                }
+            }
+            it.toFront();
+
+            delete sheetRecepient;
+            delete sheetsRecepient;
+            sheetsRecepient = workbookRecepient->querySubObject("Worksheets");
+            sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);
+
+        }
+        
+        countTimer = timer.elapsed();
+        out << "VPR finished in = " << (double)countTimer / 1000 << " sec" << Qt::endl;
+    }
+
+    if (!dayNightParametres)
+    {
+        QMultiHash< QString, QString> tabelDonorFindAndDay; // QMultiMap
+
+        for (int counter = memberRowFromFindDonor; counter < countRowsDonor; counter++)
+        {
+            compareDonor = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatFind);
+            copy = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatToInsert);
+            QString val1 = compareDonor->property("Value").toString();
+            QString val2 = copy->property("Value").toString();
+            tabelDonorFindAndDay.insert(val1, val2);
+
+        }
+
+        delete compareDonor;
+        delete copy;
+
+        workbookDonor->dynamicCall("Close()");
+        excelDonor->dynamicCall("Quit()");
+        delete workbookDonor;
+        delete excelDonor;
+
+        QMultiHashIterator<QString, QString> it(tabelDonorFindAndDay);
+
+        for (int counter = memberRowFromFindRecepient; counter < countRowsRecepient; counter++)
+        {
+            compareRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereFind);
+            paste = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereToInsert);
+
+            while (it.hasNext())
+            {
+                it.next();
+
+                if (it.key() == compareRecepient->property("Value").toString())
+                {
+                    paste->dynamicCall("SetValue(double)", it.value());
+
+                    delete compareRecepient;
+                    delete paste;
+
+                    qDebug() << "DONE NO PARAM" << counter;
+                    break;
+                }
+            }
+            it.toFront();
+
+            delete sheetRecepient;
+            delete sheetsRecepient;
+            sheetsRecepient = workbookRecepient->querySubObject("Worksheets");
+            sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);
+        }
+
+        countTimer = timer.elapsed();
+
+        out << "VPR finished in = " << (double)countTimer / 1000 << " sec" << Qt::endl;
+    }
+
+    if (!refreshChecked)
+    {
+        workbookRecepient->dynamicCall("Close()");
+        excelRecepient->dynamicCall("Quit()");
+        delete workbookRecepient;
+        delete excelRecepient;
+        return;
+    }
+
+    timer.restart();
+
+    delete Table::table2;
+
+    usedRangeColRecepient = sheetRecepient->querySubObject("UsedRange"); // так можем получить количество столбцов в документе
+    columnsRecepient = usedRangeColRecepient->querySubObject("Columns");
+    countColsRecepient = columnsRecepient->property("Count").toInt();
+
+    table2 = new QTableWidget(20, countColsRecepient, this);
+    Vbox->addWidget(table2);
+
+    QAxObject* cell = nullptr;
+    QTableWidgetItem* item = nullptr;
+
+    for (int row = 0; row < 20; ++row) {
+        for (int column = 0; column < countColsRecepient; ++column) {
+
+            cell = sheetRecepient->querySubObject("Cells(int,int)", row + 1, column + 1); // так указываем с какой ячейкой работать
+            item = new QTableWidgetItem(cell->property("Value").toString());
+            table2->setItem(row, column, item);
+        }
+    }
+
+    delete cell;
+    delete item;
+    cell = nullptr;
+    item = nullptr;
+
+    countTimer = timer.elapsed();
+
+    out << "Refresh recepient table in = " << (double)countTimer / 1000 << " sec" << Qt::endl;
+
+    workbookRecepient->dynamicCall("Close()");
+    excelRecepient->dynamicCall("Quit()");
+    delete workbookRecepient;
+    delete excelRecepient;
+    return;
+
+}
+
+
+
+void Table::addDonor() {
+
+   if (Table::readyDonor && Table::readyRecepient)
+    {
+        statusBar->showMessage("Maybe enough!", 2000);
+
+        return;
+    }
+
+   if (Table::readyDonor)
+   {
+       statusBar->showMessage("Now addFileDonor recepient!", 2000);
+
+       return;
+   }
+    
+    addFileDonor = QFileDialog::getOpenFileName(0, "Open donor file", "", "*.xls *.xlsx");
+
+    if (Table::addFileDonor == "")
+    {
+        return;
+    }
+
+    QElapsedTimer timer;
+
+    int countTimer = 0;
+
+    timer.start();
+
+    excelDonor = new QAxObject("Excel.Application", 0); 
+    workbooksDonor = excelDonor->querySubObject("Workbooks"); 
+    workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // 
+    sheetsDonor = workbookDonor->querySubObject("Worksheets");
+   
+    listDonor = sheetsDonor->property("Count").toInt(); // так можем получить количество листов в документе
+    
+    if (listDonor > 1)
+    {
+        do 
+        {
+            listDonor = QInputDialog::getInt(this, "Number of list", "What list do you need?");
+            if (!listDonor)
+            {
+                return;
+            }
+        } 
+        while (listDonor <= 0 || (listDonor > (sheetsDonor->property("Count").toInt())));
+        
+    }
+
+    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor);// Тут определяем лист с которым будем работаь
+
+    readyDonor = true;
+
+    usedRangeDonor = sheetDonor->querySubObject("UsedRange"); // так можем получить количество строк в документе
+    rowsDonor = usedRangeDonor->querySubObject("Rows");
+    countRowsDonor = rowsDonor->property("Count").toInt();
+
+    usedRangeColDonor = sheetDonor->querySubObject("UsedRange"); // так можем получить количество столбцов в документе
+    columnsDonor = usedRangeColDonor->querySubObject("Columns");
+    countColsDonor = columnsDonor->property("Count").toInt();
+
+    table = new QTableWidget(20, countColsDonor, this); // создаём тамблицу по размеру той которую открываем в excelDonor
+
+    Vbox->addWidget(table);
+
+    QAxObject* cell = nullptr;
+    QTableWidgetItem* item = nullptr;
+
+    for (int row = 0; row < 20; ++row) {
+        for (int column = 0; column < countColsDonor; ++column) {
+
+            cell = sheetDonor->querySubObject("Cells(int,int)", row + 1, column + 1); // так указываем с какой ячейкой работать
+            item = new QTableWidgetItem(cell->property("Value").toString());
+            table->setItem(row, column, item);   
+        }  
+    }
+
+    delete cell;
+    delete item;
+
+    countTimer = timer.elapsed();
+
+    out << "Add Donor table and file = " << (double)countTimer/1000  <<" sec" << Qt::endl;
+
+    workbookDonor->dynamicCall("Close()"); // обязательно используем в работе с Excel иначе документы будет фbоном открыт в системе
+    excelDonor->dynamicCall("Quit()");
+
+    delete workbookDonor;
+    delete excelDonor;
+};
+
+
+
+void Table::addRecepient() {
+
+    if (!Table::readyDonor)
+    {
+        statusBar->showMessage("Add Donor first!", 2000);
+
+        return;
+    }
+
+    if (Table::readyDonor && Table::readyRecepient)
+    {
+        statusBar->showMessage("Maybe enough!", 2000);
+
+        return;
+    }
+
+    addFileRecepient = QFileDialog::getOpenFileName(0, "Open donor file", "", "*.xls *.xlsx");
+
+
+    if (Table::addFileRecepient == "")
+    {
+        return;
+    }
+
+    readyRecepient = true;
+
+    QElapsedTimer timer;
+
+    int countTimer = 0;
+
+    timer.start();
+
+    excelRecepient = new QAxObject("Excel.Application", 0); // использование самого Excel. При использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. В общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
+    workbooksRecepient = excelRecepient->querySubObject("Workbooks"); // Витдимо это орпеделённая API для работы с COM объектом. В Нашем случае с Excel
+    workbookRecepient = workbooksRecepient->querySubObject("Open(const QString&)", addFileRecepient); // Для взаимодействия со вторым файлом обязательно переопредлелять
+    sheetsRecepient = workbookRecepient->querySubObject("Worksheets");// Для взаимодействия со вторым файлом обязательно переопредлелять
+   
+    listRecepient = sheetsRecepient->property("Count").toInt(); // так можем получить количество листов в документе
+
+    if (listRecepient > 1)
+    {
+        listRecepient = QInputDialog::getInt(this, "Number of list", "What list do you need?");
+    }
+
+    if (listRecepient > 1)
+    {
+        do
+        {
+            listRecepient = QInputDialog::getInt(this, "Number of list", "What list do you need?");
+
+            if (!listRecepient)
+            {
+                return;
+            };
+
+        } while (listRecepient <= 0 || (listRecepient > (sheetsRecepient->property("Count").toInt())));
+
+    }
+    
+    sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);// Для взаимодействия со вторым файлом обязательно переопредлелять
+
+    usedRangeRecepient = sheetRecepient->querySubObject("UsedRange"); // так можем получить количество строк в документе
+    rowsRecepient = usedRangeRecepient->querySubObject("Rows");
+    countRowsRecepient = rowsRecepient->property("Count").toInt();
+
+    usedRangeColRecepient = sheetRecepient->querySubObject("UsedRange"); // так можем получить количество столбцов в документе
+    columnsRecepient = usedRangeColRecepient->querySubObject("Columns");
+    countColsRecepient = columnsRecepient->property("Count").toInt();
+
+    table2 = new QTableWidget(20, countColsRecepient, this);
+    Vbox->addWidget(table2);
+
+    QAxObject* cell = nullptr;
+    QTableWidgetItem* item = nullptr;
+
+    // Наполняем таблицу 2 значениями из файла 2
+    for (int row = 0; row < 20; ++row) {
+        for (int column = 0; column < countColsRecepient; ++column) {
+
+            cell = sheetRecepient->querySubObject("Cells(int,int)", row + 1, column + 1); // так указываем с какой ячейкой работать
+            item = new QTableWidgetItem(cell->property("Value").toString());
+            table2->setItem(row, column, item);
+           // delete item;
+        }
+    }
+
+    delete cell;
+    delete item;
+
+    countTimer = timer.elapsed();
+
+    out << "Add Recepient table and file = " << (double)countTimer / 1000 << " sec" << Qt::endl;
+
+    workbookRecepient->dynamicCall("Close()");
+    excelRecepient->dynamicCall("Quit()");
+
+    delete workbookRecepient;
+    delete excelRecepient;
+};
+
+
+
+void Table::whatFind()
+{
+    QInputDialog inputDialog;
+    QString now = "Specify Search Values. Now ";
+    now.append(QString::number(memberWhatFind));
+    int whatFind = inputDialog.getInt(this, "What find?", now, QLineEdit::Normal, 0);
+    if (whatFind == 0 || whatFind > 30) return;
+    memberWhatFind = whatFind;
+}
+
+void Table::RowDoctor()
+{
+    QInputDialog inputDialog;
+    QString now = "Specify Search Values. Now ";
+    now.append(QString::number(memberRowFromFindDonor));
+    int whatFind = inputDialog.getInt(this, "What find?", now, QLineEdit::Normal, 0);
+    if (whatFind == 0 || whatFind > 30) return;
+    memberRowFromFindDonor = whatFind;
+}
+
+void Table::whereFind()
+{
+    QInputDialog inputDialog;
+    QString now = "Specify Search Values. Now ";
+    now.append(QString::number(memberWhereFind));
+    int whatFind = inputDialog.getInt(this, "Where find?", now, QLineEdit::Normal, 0);
+    if (whatFind == 0 || whatFind > 30) return;
+    memberWhereFind = whatFind;
+}
+
+void Table::RowRecepient()
+{
+    QInputDialog inputDialog;
+    QString now = "Specify Search Values. Now ";
+    now.append(QString::number(memberRowFromFindRecepient));
+    int whatFind = inputDialog.getInt(this, "What find?", now, QLineEdit::Normal, 0);
+    if (whatFind == 0 || whatFind > 30) return;
+    memberRowFromFindRecepient = whatFind;
+}
+
+void Table::whereDayNightDonor()
+{
+    QInputDialog inputDialog;
+    QString now = "Specify where tariffing. Now ";
+    now.append(QString::number(memberwhereDayNightDonor));
+    int whatFind = inputDialog.getInt(this, "Where Day/Night?", now, QLineEdit::Normal, 0);
+    if (whatFind == 0 || whatFind > 30) return;
+    memberwhereDayNightDonor = whatFind;
+}
+
+void Table::whereDayNightRecepient()
+{
+    QInputDialog inputDialog;
+    QString now = "Specify whew tariffing. Now ";
+    now.append(QString::number(memberwhereDayNightRecepient));
+    int whatFind = inputDialog.getInt(this, "Where Day/Night?", now, QLineEdit::Normal, 0);
+    if (whatFind == 0 || whatFind > 30) return;
+    memberwhereDayNightRecepient = whatFind;
+}
+
+void Table::whatToInsert()
+{
+    QInputDialog inputDialog;
+    QString now = "Specify what to insert. Now ";
+    now.append(QString::number(memberWhatToInsert));
+    int whatFind = inputDialog.getInt(this, "Where to insert?", now, QLineEdit::Normal, 0);
+    if (whatFind == 0 || whatFind > 30) return;
+    memberWhatToInsert = whatFind;
+}
+
+void Table::whereToInsert()
+{
+    QInputDialog inputDialog;
+    QString now = "Specify where to insert. Now ";
+    now.append(QString::number(memberWhereToInsert));
+    int whatFind = inputDialog.getInt(this, "Where to insert?", now, QLineEdit::Normal, 0);
+    if (whatFind == 0 || whatFind > 30) return;
+    memberWhereToInsert = whatFind;
+}
+
+void Table::checkStateForRefresh(int state) {
+
+    if (state == Qt::Checked) {
+        refreshChecked = true;
+    }
+    else {
+        refreshChecked = false;
+    }
+}
+
+void Table::checkDayNight(int myState) {
+
+    if (myState == Qt::Checked) {
+        dayNightParametres = true;
+        
+    }
+    else {
+        dayNightParametres = false;
+        
+    }
+}
+
+void Table::readFileConfig()
+{
+    QString saved = QFileDialog::getOpenFileName(0, "Load parameters from other file", "", "*.txt");
+
+    if (saved == "")
+    {
+        return;
+    }
+    QFile configFile(saved);
+
+    if (!configFile.open(QIODevice::ReadOnly))
+    {
+        out << "Dont find config file. Used default cofiguration." << Qt::endl;
+        return;
+    }
+
+    QTextStream in(&configFile);
+
+    int countParam = 0;
+
+    // Считываем файл строка за строкой
+    while (!in.atEnd())
+    { // метод atEnd() возвращает true, если в потоке больше нет данных для чтения
+        QString line = in.readLine(); // метод readLine() считывает одну строку из потока
+        ++countParam;
+        QString temporary;
+
+        for (auto& val : line)
+        {
+            if (val.isDigit())
+            {
+                temporary += val;
+            }
+        }
+
+        switch (countParam)
+        {
+
+        case(1):
+        {
+            qDebug() << "Where find in Donor before load config = " << memberWhatFind;
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            memberWhatFind = temporary.toInt();
+            qDebug() << "Where find in Donor after load config = " << memberWhatFind;
+            break;
+        }
+        case(2):
+        {
+            qDebug() << "Start Row find in Donor before load config = " << memberRowFromFindDonor;
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            memberRowFromFindDonor = temporary.toInt();
+            qDebug() << "Start Row find in Donor after load config = " << memberRowFromFindDonor;
+            break;
+        }
+        case(3):
+        {
+            qDebug() << "Where find in Recepient before load config = " << memberWhereFind;
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            memberWhereFind = temporary.toInt();
+            qDebug() << "Where find in Recepient after load config = " << memberWhereFind;
+            break;
+        }
+        case(4):
+        {
+            qDebug() << "Start Row find in Recepient before load config = " << memberRowFromFindRecepient;
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            memberWhereFind = temporary.toInt();
+            qDebug() << "Start Row find in Recepient after load config = " << memberRowFromFindRecepient;
+            break;
+        }
+        case(5):
+        {
+            qDebug() << "Where Day/Night of Donor before load config = " << memberwhereDayNightDonor;
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            memberwhereDayNightDonor = temporary.toInt();
+            qDebug() << "Where Day/Night of Donor after load config = " << memberwhereDayNightDonor;
+            break;
+        }
+        case(6):
+        {
+            qDebug() << "Where Day/Night of Recepient before load config = " << memberwhereDayNightRecepient;
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            memberwhereDayNightRecepient = temporary.toInt();
+            qDebug() << "Where Day/Night of Recepient after load config = " << memberwhereDayNightRecepient;
+            break;
+        }
+        case(7):
+        {
+            qDebug() << "What to insert in Donor before load config = " << memberWhatToInsert;
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            memberWhatToInsert = temporary.toInt();
+            qDebug() << "What to insert in Donor after load config = " << memberWhatToInsert;
+            break;
+        }
+        case(8):
+        {
+            qDebug() << "Where to insert in Recepient before load config = " << memberWhereToInsert;
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            memberWhereToInsert = temporary.toInt();
+            qDebug() << "Where to insert in Recepient after load config = " << memberWhereToInsert;
+            break;
+        }
+        case(9):
+        {
+            qDebug() << "Refresh function before load config = " << refreshChecked;
+            if ((temporary.toInt() < 0) || (temporary.toInt() > 1))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            refreshChecked = temporary.toInt();
+            qDebug() << "Refresh function after load config = " << refreshChecked;
+            break;
+        }
+        case(10):
+        {
+            qDebug() << "Day/Night function before load config = " << dayNightParametres;
+            if ((temporary.toInt() < 0) || (temporary.toInt() > 1))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            dayNightParametres = temporary.toInt();
+            qDebug() << "Day/Night function after load config = " << dayNightParametres;
+            break;
+        }
+        }
+    }
+
+    configFile.close();
+}
+
+
+
+void Table::readDefaultFileConfig()
+{
+    QString filename = "config.txt";
+    QFile file(filename);
+
+	if (!file.open(QIODevice::ReadOnly))
+	{
+		out << "Dont fide config file. Used default cofiguration." << Qt::endl;
+		return;
+	}
+
+	QTextStream in(&file);
+
+	int countParam = 0;
+
+	// Считываем файл строка за строкой
+	while (!in.atEnd())
+	{ // метод atEnd() возвращает true, если в потоке больше нет данных для чтения
+		QString line = in.readLine(); // метод readLine() считывает одну строку из потока
+		++countParam;
+		QString temporary;
+
+		for (auto& val : line)
+		{ 
+			if (val.isDigit())
+			{
+				temporary += val;
+			}
+		}
+
+		switch (countParam)
+		{
+
+		case(1):
+		{
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Default value will be used.";
+                break;
+            }
+			memberWhatFind = temporary.toInt();
+			break;
+		}
+        case(2):
+        {
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Default value will be used.";
+                break;
+            }
+            memberRowFromFindDonor = temporary.toInt();
+            break;
+        }
+		case(3):
+		{
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Default value will be used.";
+                break;
+            }
+			memberWhereFind = temporary.toInt();
+			break;
+		}
+        case(4):
+        {
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Default value will be used.";
+                break;
+            }
+            memberRowFromFindRecepient = temporary.toInt();
+            break;
+        }
+		case(5):
+		{
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Default value will be used.";
+                break;
+            }
+			memberwhereDayNightDonor = temporary.toInt();
+			break;
+		}
+		case(6):
+		{
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Default value will be used.";
+                break;
+            }
+			memberwhereDayNightRecepient = temporary.toInt();
+			break;
+		}
+		case(7):
+		{
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Default value will be used.";
+                break;
+            }
+			memberWhatToInsert = temporary.toInt();
+			break;
+		}
+		case(8):
+		{
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Default value will be used.";
+                break;
+            }
+			memberWhereToInsert = temporary.toInt();
+			break;
+		}
+        case(9):
+        {
+            if ((temporary.toInt() < 0) || (temporary.toInt() > 1))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            refreshChecked = temporary.toInt();
+            cb->setChecked(refreshChecked);
+            break;
+        }
+        case(10):
+        {
+            if ((temporary.toInt() < 0) || (temporary.toInt() > 1))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            dayNightParametres = temporary.toInt();
+            dayNightCheck->setChecked(dayNightParametres);
+            break;
+        }
+		}
+	}
+    file.close();
+}
+
+void Table::writeCurrent()
+{
+    QString filename = "config.txt";
+    QFile file(filename);
+    
+    // Открываем файл в режиме "Только для записи"
+    if (file.open(QIODevice::WriteOnly)) {
+        QTextStream out(&file); // поток записываемых данных направляем в файл
+
+        // Для записи данных в файл используем оператор <<
+        out << "memberWhatFind = " << memberWhatFind << Qt::endl;
+        out << "memberRowFromFindDonor = " << memberRowFromFindDonor << Qt::endl;
+        out << "memberWhereFind = " << memberWhereFind << Qt::endl;
+        out << "memberRowFromFindRecepient = " << memberRowFromFindRecepient << Qt::endl;
+        out << "memberwhereDayNightDonor = " << memberwhereDayNightDonor << Qt::endl;
+        out << "memberwhereDayNightRecepient = " << memberwhereDayNightRecepient << Qt::endl;
+        out << "memberWhatToInsert = " << memberWhatToInsert << Qt::endl;
+        out << "memberWhereToInsert = " << memberWhereToInsert << Qt::endl;
+        out << "refreshChecked = " << refreshChecked << Qt::endl;
+        out << "dayNightParametres = " << dayNightParametres << Qt::endl;
+    }
+    else 
+    {
+        qWarning("Could not open file");
+    }
+
+    file.close();
+
+    statusBar->showMessage("Default parameters was save.", 2000);
+}
+
+void Table::writeCurrentinOtherFile()
+{
+    QString savedFile = QFileDialog::getSaveFileName(0, "Save parameters in other file", "", "*.txt");
+
+    if (savedFile == "") return;
+
+    QFile file(savedFile);
+    file.open(QIODevice::WriteOnly);
+    QTextStream out(&file); // поток записываемых данных направляем в файл
+
+    // Для записи данных в файл используем оператор <<
+    out << "memberWhatFind = " << memberWhatFind << Qt::endl;
+    out << "memberRowFromFindDonor = " << memberRowFromFindDonor << Qt::endl;
+    out << "memberWhereFind = " << memberWhereFind << Qt::endl;
+    out << "memberRowFromFindRecepient = " << memberRowFromFindRecepient << Qt::endl;
+    out << "memberwhereDayNightDonor = " << memberwhereDayNightDonor << Qt::endl;
+    out << "memberwhereDayNightRecepient = " << memberwhereDayNightRecepient << Qt::endl;
+    out << "memberWhatToInsert = " << memberWhatToInsert << Qt::endl;
+    out << "memberWhereToInsert = " << memberWhereToInsert << Qt::endl;
+    out << "refreshChecked = " << refreshChecked << Qt::endl;
+    out << "dayNightParametres = " << dayNightParametres << Qt::endl;
+
+    file.close();
+
+    statusBar->showMessage("New file with parameters was save.", 2000);
+}
+
+
+
