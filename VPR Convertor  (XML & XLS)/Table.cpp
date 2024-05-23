@@ -67,6 +67,11 @@ Table::Table(QWidget* parent)
     dayNightCheck = new QCheckBox("Use Day/Night parameters", this);
     connect(dayNightCheck, &QCheckBox::stateChanged, this, &Table::checkDayNight);
 
+    refresh = new QPushButton("Refresh", this);
+    connect(refresh, &QPushButton::clicked, this, &Table::refreshAllButtons);
+
+
+
     VboxButtons->setSpacing(10); // расстояние между виджетами внутри вертикального бокса
     VboxButtons->addStretch(1); // равноудаляет от краёв или типо того
     VboxButtons->addWidget(cb);
@@ -77,6 +82,7 @@ Table::Table(QWidget* parent)
     VboxButtons->addWidget(loadConfig);
     VboxButtons->addWidget(savedConfig);
     VboxButtons->addWidget(paramMenu);
+    VboxButtons->addWidget(refresh);
 
     VboxButtons->addWidget(statusBar);
     VboxButtons->addStretch(1); // равноудаляет от краёв или типо того
@@ -977,7 +983,20 @@ void Table::writeCurrentinOtherFile()
     statusBar->showMessage("New file with parameters was save.", 2000);
 }
 
-//git test 1
+void Table::refreshAllButtons()
+{
+    if (readyDonor)
+    {
+        delete Table::table;
+        readyDonor = false;
+    }
+
+    if (readyRecepient)
+    {
+        delete Table::table2;
+        readyRecepient = false;
+    }
+}
 
 
 

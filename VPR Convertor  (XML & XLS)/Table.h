@@ -39,6 +39,7 @@ private slots:
     void writeCurrent();
     void readDefaultFileConfig();
     void writeCurrentinOtherFile();
+    void refreshAllButtons();
 
 private:
 
@@ -48,6 +49,7 @@ private:
     QPushButton* paramMenu = nullptr;
     QPushButton* loadConfig = nullptr;
     QPushButton* savedConfig = nullptr;
+    QPushButton* refresh = nullptr;
 
     QMenu* pm = nullptr;
     QMenu* saveMenu = nullptr;
