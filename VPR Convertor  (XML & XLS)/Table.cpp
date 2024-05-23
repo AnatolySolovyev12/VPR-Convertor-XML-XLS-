@@ -695,7 +695,7 @@ void Table::readFileConfig()
                 qDebug() << "Parameter in file going beyond borders! Old value will be used.";
                 break;
             }
-            memberWhereFind = temporary.toInt();
+            memberRowFromFindRecepient = temporary.toInt();
             qDebug() << "Start Row find in Recepient after load config = " << memberRowFromFindRecepient;
             break;
         }
