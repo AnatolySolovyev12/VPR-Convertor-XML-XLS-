@@ -983,7 +983,7 @@ void Table::writeCurrentinOtherFile()
     statusBar->showMessage("New file with parameters was save.", 2000);
 }
 
-void Table::refreshAllButtons()
+void Table::refreshAllButtons() // обновл€ет окно программы до начального состо€ни€
 {
     if (readyDonor)
     {
