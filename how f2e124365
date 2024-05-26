@@ -1,0 +1,35 @@
+[33mcommit 9a66743475538fd0f87f11ba5e58fd0aab894461[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: AnatolySolovyev12 <167902367+AnatolySolovyev12@users.noreply.github.com>
+Date:   Sun May 26 13:13:01 2024 +0300
+
+    Add refresh function NEW
+
+[33mcommit b200058656b283604f890ab08ed1611c8af3bbf0[m
+Author: AnatolySolovyev12 <167902367+AnatolySolovyev12@users.noreply.github.com>
+Date:   Thu May 23 23:33:50 2024 +0300
+
+    Add Refresh functional
+
+[33mcommit f2e124365dbdeef9647ef2d977e79b9aae5dc8bb[m
+Author: AnatolySolovyev12 <167902367+AnatolySolovyev12@users.noreply.github.com>
+Date:   Thu May 23 23:13:23 2024 +0300
+
+    Fix config parametr with start sting for VPR
+
+[33mcommit e06d8db28dc08e1fc3854994bca5229ad961f042[m
+Author: AnatolySolovyev12 <167902367+AnatolySolovyev12@users.noreply.github.com>
+Date:   Mon May 20 22:07:26 2024 +0300
+
+    Test commit with MVS #1
+
+[33mcommit 406b4271838461b4f430f9675653713666543a58[m
+Author: AnatolySolovyev12 <167902367+AnatolySolovyev12@users.noreply.github.com>
+Date:   Mon May 20 21:56:46 2024 +0300
+
+    Добавьте файлы проекта.
+
+[33mcommit 6112fdb888d83592e74f8ab0711c3b22cf792dc2[m
+Author: AnatolySolovyev12 <167902367+AnatolySolovyev12@users.noreply.github.com>
+Date:   Mon May 20 21:56:44 2024 +0300
+
+    Добавить .gitattributes и .gitignore.
