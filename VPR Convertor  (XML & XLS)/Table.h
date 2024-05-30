@@ -40,6 +40,8 @@ private slots:
     void readDefaultFileConfig();
     void writeCurrentinOtherFile();
     void refreshAllButtons();
+    void lastLineInDonor();
+    void lastLineInRecepient();
 
 private:
 
@@ -71,6 +73,8 @@ private:
     int memberWhereToInsert = 4;
     int listDonor = 1;
     int listRecepient = 1;
+    int lastLineDonor = 0;
+    int lastLineRecepient = 0;
 
     bool readyDonor = false;
     bool readyRecepient = false;

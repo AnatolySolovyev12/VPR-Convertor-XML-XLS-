@@ -45,6 +45,8 @@ Table::Table(QWidget* parent)
     pm->addAction("&Where Day/Night of Recepient?", this, &Table::whereDayNightRecepient);
     pm->addAction("&What to insert in Donor?", this, &Table::whatToInsert);
     pm->addAction("&Where to insert in Recepient?", this, &Table::whereToInsert);
+    pm->addAction("&Indent from last line with text in Donor?", this, &Table::lastLineInDonor);
+    pm->addAction("&Indent from last line with text in Recepient?", this, &Table::lastLineInRecepient);
 
     paramMenu->setMenu(pm);
 
@@ -136,7 +138,7 @@ void Table::myVPR()
 
         QMultiHash<QPair<QString, QString>, QVariant> tabelDonorFindAndDay; // профита нет
 
-        for (int counter = memberRowFromFindDonor; counter <= countRowsDonor; counter++)
+        for (int counter = memberRowFromFindDonor; counter <= (countRowsDonor - lastLineDonor); counter++)
         {
             compareDonor = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatFind);
             dayDonor = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberwhereDayNightDonor);
@@ -168,7 +170,7 @@ void Table::myVPR()
 
         int countDoingIterationForTime = 0;
 
-        for (int counter = memberRowFromFindRecepient; counter <= countRowsRecepient; counter++)
+        for (int counter = memberRowFromFindRecepient; counter <= (countRowsRecepient - lastLineRecepient); counter++)
         {
 
             compareRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereFind);
@@ -217,7 +219,7 @@ void Table::myVPR()
     {
         QMultiHash< QString, QString> tabelDonorFindAndDay; // QMultiMap
 
-        for (int counter = memberRowFromFindDonor; counter < countRowsDonor; counter++)
+        for (int counter = memberRowFromFindDonor; counter < (countRowsDonor - lastLineDonor); counter++)
         {
             compareDonor = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatFind);
             copy = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatToInsert);
@@ -237,7 +239,7 @@ void Table::myVPR()
 
         QMultiHashIterator<QString, QString> it(tabelDonorFindAndDay);
 
-        for (int counter = memberRowFromFindRecepient; counter < countRowsRecepient; counter++)
+        for (int counter = memberRowFromFindRecepient; counter < (countRowsRecepient - lastLineRecepient); counter++)
         {
             compareRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereFind);
             paste = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereToInsert);
@@ -406,6 +408,13 @@ void Table::addDonor() {
 
     out << "Add Donor table and file = " << (double)countTimer/1000  <<" sec" << Qt::endl;
 
+    if (countRowsDonor < lastLineDonor)
+    {
+        lastLineDonor = 0;
+
+        qDebug() << "Indent from last line with text in Donor is more than the number of lines of text in Donor. Used default cofiguration.";
+    }
+
     workbookDonor->dynamicCall("Close()"); // обязательно используем в работе с Excel иначе документы будет фbоном открыт в системе
     excelDonor->dynamicCall("Quit()");
 
@@ -456,11 +465,6 @@ void Table::addRecepient() {
 
     if (listRecepient > 1)
     {
-        listRecepient = QInputDialog::getInt(this, "Number of list", "What list do you need?");
-    }
-
-    if (listRecepient > 1)
-    {
         do
         {
             listRecepient = QInputDialog::getInt(this, "Number of list", "What list do you need?");
@@ -508,6 +512,13 @@ void Table::addRecepient() {
 
     out << "Add Recepient table and file = " << (double)countTimer / 1000 << " sec" << Qt::endl;
 
+    if (countRowsRecepient < lastLineRecepient)
+    {
+        lastLineRecepient = 0;
+
+        qDebug() << "Indent from last line with text in Recepient is more than the number of lines of text in Donor. Used default cofiguration.";
+    }
+
     workbookRecepient->dynamicCall("Close()");
     excelRecepient->dynamicCall("Quit()");
 
@@ -519,82 +530,106 @@ void Table::addRecepient() {
 
 void Table::whatFind()
 {
+    bool ok = true;
     QInputDialog inputDialog;
     QString now = "Specify Search Values. Now ";
     now.append(QString::number(memberWhatFind));
-    int whatFind = inputDialog.getInt(this, "What find?", now, QLineEdit::Normal, 0);
-    if (whatFind == 0 || whatFind > 30) return;
+    int whatFind = inputDialog.getInt(this, "What find?", now, memberWhatFind, 0, 30, 1, &ok);
     memberWhatFind = whatFind;
 }
 
 void Table::RowDoctor()
 {
+    bool ok = true;
     QInputDialog inputDialog;
     QString now = "Specify Search Values. Now ";
     now.append(QString::number(memberRowFromFindDonor));
-    int whatFind = inputDialog.getInt(this, "What find?", now, QLineEdit::Normal, 0);
-    if (whatFind == 0 || whatFind > 30) return;
+    int whatFind = inputDialog.getInt(this, "What find?", now, memberRowFromFindDonor, 0, 30, 1, &ok);
     memberRowFromFindDonor = whatFind;
 }
 
 void Table::whereFind()
 {
+    bool ok = true;
     QInputDialog inputDialog;
     QString now = "Specify Search Values. Now ";
     now.append(QString::number(memberWhereFind));
-    int whatFind = inputDialog.getInt(this, "Where find?", now, QLineEdit::Normal, 0);
-    if (whatFind == 0 || whatFind > 30) return;
+    int whatFind = inputDialog.getInt(this, "Where find?", now, memberWhereFind, 0, 30, 1, &ok);
     memberWhereFind = whatFind;
 }
 
 void Table::RowRecepient()
 {
+    bool ok = true;
     QInputDialog inputDialog;
     QString now = "Specify Search Values. Now ";
     now.append(QString::number(memberRowFromFindRecepient));
-    int whatFind = inputDialog.getInt(this, "What find?", now, QLineEdit::Normal, 0);
-    if (whatFind == 0 || whatFind > 30) return;
+    int whatFind = inputDialog.getInt(this, "What find?", now, memberRowFromFindRecepient, 0, 30, 1, &ok);
     memberRowFromFindRecepient = whatFind;
 }
 
 void Table::whereDayNightDonor()
 {
+    bool ok = true;
     QInputDialog inputDialog;
     QString now = "Specify where tariffing. Now ";
     now.append(QString::number(memberwhereDayNightDonor));
-    int whatFind = inputDialog.getInt(this, "Where Day/Night?", now, QLineEdit::Normal, 0);
-    if (whatFind == 0 || whatFind > 30) return;
+    int whatFind = inputDialog.getInt(this, "Where Day/Night?", now, memberwhereDayNightDonor, 0, 30, 1, &ok);
     memberwhereDayNightDonor = whatFind;
 }
 
 void Table::whereDayNightRecepient()
 {
+    bool ok = true;
     QInputDialog inputDialog;
     QString now = "Specify whew tariffing. Now ";
     now.append(QString::number(memberwhereDayNightRecepient));
-    int whatFind = inputDialog.getInt(this, "Where Day/Night?", now, QLineEdit::Normal, 0);
-    if (whatFind == 0 || whatFind > 30) return;
+    int whatFind = inputDialog.getInt(this, "Where Day/Night?", now, memberwhereDayNightRecepient, 0, 30, 1, &ok);
     memberwhereDayNightRecepient = whatFind;
 }
 
 void Table::whatToInsert()
 {
+    bool ok = true;
     QInputDialog inputDialog;
     QString now = "Specify what to insert. Now ";
     now.append(QString::number(memberWhatToInsert));
-    int whatFind = inputDialog.getInt(this, "Where to insert?", now, QLineEdit::Normal, 0);
-    if (whatFind == 0 || whatFind > 30) return;
+    int whatFind = inputDialog.getInt(this, "Where to insert?", now, memberWhatToInsert, 0, 30, 1, &ok);
     memberWhatToInsert = whatFind;
 }
 
 void Table::whereToInsert()
 {
+    bool ok = true;
     QInputDialog inputDialog;
     QString now = "Specify where to insert. Now ";
     now.append(QString::number(memberWhereToInsert));
-    int whatFind = inputDialog.getInt(this, "Where to insert?", now, QLineEdit::Normal, 0);
-    if (whatFind == 0 || whatFind > 30) return;
+    int whatFind = inputDialog.getInt(this, "Where to insert?", now, memberWhereToInsert, 0, 30, 1, &ok);
     memberWhereToInsert = whatFind;
+}
+
+void Table::lastLineInDonor()
+{
+    bool ok = true;
+    int border = 100;
+    if (readyDonor) border = countRowsDonor;
+    QInputDialog inputDialog;
+    QString now = "Specify indent from last line with text in Donor. Now ";
+    now.append(QString::number(lastLineDonor));
+    int whatFind = inputDialog.getInt(this, "Indent from last line with text?", now, lastLineDonor, 0, border, 1, &ok);
+    lastLineDonor = whatFind;
+}
+
+void Table::lastLineInRecepient()
+{
+    bool ok = true;
+    int border = 100;
+    if (readyRecepient) border = countRowsRecepient;
+    QInputDialog inputDialog;
+    QString now = "Specify indent from last line with text in Recepient. Now ";
+    now.append(QString::number(lastLineRecepient));
+    int whatFind = inputDialog.getInt(this, "Indent from last line with text?", now, lastLineRecepient, 0, border, 1, &ok);
+    lastLineRecepient = whatFind;
 }
 
 void Table::checkStateForRefresh(int state) {
@@ -777,6 +812,34 @@ void Table::readFileConfig()
             qDebug() << "Day/Night function after load config = " << dayNightParametres;
             break;
         }
+        case(11):
+        {
+            int border = 100;
+            if (readyDonor) border = countRowsDonor;
+            qDebug() << "Indent from last line with text in Donor before load config = " << lastLineDonor;
+            if ((temporary.toInt() < 0) || (temporary.toInt() > border))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            lastLineDonor = temporary.toInt();
+            qDebug() << "Indent from last line with text in Donor after load config = " << lastLineDonor;
+            break;
+        }
+        case(12):
+        {
+            int border = 100;
+            if (readyRecepient) border = countRowsRecepient;
+            qDebug() << "Indent from last line with text in Recepient before load config = " << lastLineRecepient;
+            if ((temporary.toInt() < 0) || (temporary.toInt() > border))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            lastLineRecepient = temporary.toInt();
+            qDebug() << "Indent from last line with text in Recepient after load config = " << lastLineRecepient;
+            break;
+        }
         }
     }
 
@@ -920,6 +983,26 @@ void Table::readDefaultFileConfig()
             dayNightCheck->setChecked(dayNightParametres);
             break;
         }
+        case(11):
+        {
+            if ((temporary.toInt() < 0) || (temporary.toInt() > 100))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            lastLineDonor = temporary.toInt();
+            break;
+        }
+        case(12):
+        {
+            if ((temporary.toInt() < 0) || (temporary.toInt() > 100))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            lastLineRecepient = temporary.toInt();
+            break;
+        }
 		}
 	}
     file.close();
@@ -945,6 +1028,8 @@ void Table::writeCurrent()
         out << "memberWhereToInsert = " << memberWhereToInsert << Qt::endl;
         out << "refreshChecked = " << refreshChecked << Qt::endl;
         out << "dayNightParametres = " << dayNightParametres << Qt::endl;
+        out << "lastLineDonor = " << lastLineDonor << Qt::endl;
+        out << "lastLineRecepient = " << lastLineRecepient << Qt::endl;
     }
     else 
     {
@@ -977,6 +1062,8 @@ void Table::writeCurrentinOtherFile()
     out << "memberWhereToInsert = " << memberWhereToInsert << Qt::endl;
     out << "refreshChecked = " << refreshChecked << Qt::endl;
     out << "dayNightParametres = " << dayNightParametres << Qt::endl;
+    out << "lastLineDonor = " << lastLineDonor << Qt::endl;
+    out << "lastLineRecepient = " << lastLineRecepient << Qt::endl;
 
     file.close();
 
