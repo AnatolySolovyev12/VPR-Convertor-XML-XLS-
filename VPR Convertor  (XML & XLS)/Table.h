@@ -42,6 +42,8 @@ private slots:
     void refreshAllButtons();
     void lastLineInDonor();
     void lastLineInRecepient();
+    void colorColumnRecepientFunc();
+    void checkColorRecepient(int myState);
 
 private:
 
@@ -75,11 +77,13 @@ private:
     int listRecepient = 1;
     int lastLineDonor = 0;
     int lastLineRecepient = 0;
+    int colorColumnRecepint = 9;
 
     bool readyDonor = false;
     bool readyRecepient = false;
     bool refreshChecked = false;
     bool dayNightParametres = false;
+    bool colorChecked = false;
 
     QString addFileDonor;
     QString addFileRecepient;
@@ -104,6 +108,7 @@ private:
     QAxObject* rowsRecepient = nullptr;
     QAxObject* usedRangeColRecepient = nullptr;
     QAxObject* columnsRecepient = nullptr;
+    QAxObject* colorColumnRecepient = nullptr;
 
     QVBoxLayout* Vbox = nullptr;
 
@@ -111,6 +116,7 @@ private:
 
     QCheckBox* cb;
     QCheckBox* dayNightCheck;
+    QCheckBox* colorCheck;
 
     
     /* // Использовался в ранеем варианте VPR. Изменения не отразились на скорости работы алгоритма

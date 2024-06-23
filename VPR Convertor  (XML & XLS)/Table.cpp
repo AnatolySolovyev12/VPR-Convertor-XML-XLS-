@@ -47,6 +47,8 @@ Table::Table(QWidget* parent)
     pm->addAction("&Where to insert in Recepient?", this, &Table::whereToInsert);
     pm->addAction("&Indent from last line with text in Donor?", this, &Table::lastLineInDonor);
     pm->addAction("&Indent from last line with text in Recepient?", this, &Table::lastLineInRecepient);
+    pm->addAction("&What column for find negative values?", this, &Table::colorColumnRecepientFunc);
+
 
     paramMenu->setMenu(pm);
 
@@ -69,6 +71,9 @@ Table::Table(QWidget* parent)
     dayNightCheck = new QCheckBox("Use Day/Night parameters", this);
     connect(dayNightCheck, &QCheckBox::stateChanged, this, &Table::checkDayNight);
 
+    colorCheck = new QCheckBox("Find negative values", this);
+    connect(colorCheck, &QCheckBox::stateChanged, this, &Table::checkColorRecepient);
+
     refresh = new QPushButton("Refresh", this);
     connect(refresh, &QPushButton::clicked, this, &Table::refreshAllButtons);
 
@@ -78,6 +83,7 @@ Table::Table(QWidget* parent)
     VboxButtons->addStretch(1); // равноудаляет от краёв или типо того
     VboxButtons->addWidget(cb);
     VboxButtons->addWidget(dayNightCheck);
+    VboxButtons->addWidget(colorCheck);
     VboxButtons->addWidget(VPR);
     VboxButtons->addWidget(donor);
     VboxButtons->addWidget(recepient);
@@ -131,6 +137,7 @@ void Table::myVPR()
     QAxObject* compareRecepient = nullptr;
     QAxObject* paste = nullptr;
     QAxObject* dayRecepient = nullptr;
+    QAxObject* negativeValue = nullptr;
 
     if (dayNightParametres)
     {
@@ -172,10 +179,10 @@ void Table::myVPR()
 
         for (int counter = memberRowFromFindRecepient; counter <= (countRowsRecepient - lastLineRecepient); counter++)
         {
-
             compareRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereFind);
             paste = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereToInsert);
             dayRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberwhereDayNightRecepient);
+            negativeValue = sheetRecepient->querySubObject("Cells(&int,&int)", counter, colorColumnRecepint);
 
             while (it.hasNext())
             {
@@ -199,7 +206,35 @@ void Table::myVPR()
                     delete paste;
                     delete dayRecepient;
 
+                    if (colorChecked)
+                    {
+                        if (negativeValue->property("Value").toDouble() < 0)
+                        {
+                            // получаем указатель на её фон
+                            QAxObject* interior = negativeValue->querySubObject("Interior");
+                            // устанавливаем цвет
+                            interior->setProperty("Color", QColor("red"));
+                            // освобождение памяти
+                            delete interior;
+                        }
+                    }
+
+                    delete negativeValue;
+
                     break;
+                }
+
+                if (colorChecked)
+                {
+                    if (negativeValue->property("Value").toDouble() < 0)
+                    {
+                        // получаем указатель на её фон
+                        QAxObject* interior = negativeValue->querySubObject("Interior");
+                        // устанавливаем цвет
+                        interior->setProperty("Color", QColor("red"));
+                        // освобождение памяти
+                        delete interior;
+                    }
                 }
             }
             it.toFront();
@@ -243,6 +278,7 @@ void Table::myVPR()
         {
             compareRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereFind);
             paste = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereToInsert);
+            negativeValue = sheetRecepient->querySubObject("Cells(&int,&int)", counter, colorColumnRecepint);
 
             while (it.hasNext())
             {
@@ -255,9 +291,38 @@ void Table::myVPR()
                     delete compareRecepient;
                     delete paste;
 
+                    if (colorChecked)
+                    {
+                        if (negativeValue->property("Value").toDouble() < 0)
+                        {
+                            // получаем указатель на её фон
+                            QAxObject* interior = negativeValue->querySubObject("Interior");
+                            // устанавливаем цвет
+                            interior->setProperty("Color", QColor("red"));
+                            // освобождение памяти
+                            delete interior;
+                        }
+                    }
+
+                    delete negativeValue;
+
                     qDebug() << "DONE NO PARAM" << counter;
                     break;
                 }
+
+                if (colorChecked)
+                {
+                    if (negativeValue->property("Value").toDouble() < 0)
+                    {
+                        // получаем указатель на её фон
+                        QAxObject* interior = negativeValue->querySubObject("Interior");
+                        // устанавливаем цвет
+                        interior->setProperty("Color", QColor("red"));
+                        // освобождение памяти
+                        delete interior;
+                    }
+                }
+
             }
             it.toFront();
 
@@ -584,7 +649,7 @@ void Table::whereDayNightRecepient()
 {
     bool ok = true;
     QInputDialog inputDialog;
-    QString now = "Specify whew tariffing. Now ";
+    QString now = "Specify where tariffing. Now ";
     now.append(QString::number(memberwhereDayNightRecepient));
     int whatFind = inputDialog.getInt(this, "Where Day/Night?", now, memberwhereDayNightRecepient, 0, 30, 1, &ok);
     memberwhereDayNightRecepient = whatFind;
@@ -634,6 +699,16 @@ void Table::lastLineInRecepient()
     lastLineRecepient = whatFind;
 }
 
+void Table::colorColumnRecepientFunc()
+{
+    bool ok = true;
+    QInputDialog inputDialog;
+    QString now = "Specify where find Negative. Now ";
+    now.append(QString::number(colorColumnRecepint));
+    int whatFind = inputDialog.getInt(this, "Where find Negative?", now, colorColumnRecepint, 0, 30, 1, &ok);
+    colorColumnRecepint = whatFind;
+}
+
 void Table::checkStateForRefresh(int state) {
 
     if (state == Qt::Checked) {
@@ -648,11 +723,19 @@ void Table::checkDayNight(int myState) {
 
     if (myState == Qt::Checked) {
         dayNightParametres = true;
-        
     }
     else {
         dayNightParametres = false;
-        
+    }
+}
+
+void Table::checkColorRecepient(int myState) {
+
+    if (myState == Qt::Checked) {
+        colorChecked = true;
+    }
+    else {
+        colorChecked = false;
     }
 }
 
@@ -842,6 +925,30 @@ void Table::readFileConfig()
             qDebug() << "Indent from last line with text in Recepient after load config = " << lastLineRecepient;
             break;
         }
+        case(13):
+        {
+            qDebug() << "Where find negative values = " << colorColumnRecepint;
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            colorColumnRecepint = temporary.toInt();
+            qDebug() << "Where find negative values = " << colorColumnRecepint;
+            break;
+        }
+        case(14):
+        {
+            qDebug() << "Negative find function before load config = " << colorChecked;
+            if ((temporary.toInt() < 0) || (temporary.toInt() > 1))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            colorChecked = temporary.toInt();
+            qDebug() << "Negative find after load config = " << colorChecked;
+            break;
+        }
         }
     }
 
@@ -1005,6 +1112,27 @@ void Table::readDefaultFileConfig()
             lastLineRecepient = temporary.toInt();
             break;
         }
+        case(13):
+        {
+            if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
+            {
+                qDebug() << "Parameter in file going beyond borders! Default value will be used.";
+                break;
+            }
+            colorColumnRecepint = temporary.toInt();
+            break;
+        }
+        case(14):
+        {
+            if ((temporary.toInt() < 0) || (temporary.toInt() > 1))
+            {
+                qDebug() << "Parameter in file going beyond borders! Old value will be used.";
+                break;
+            }
+            colorChecked = temporary.toInt();
+            colorCheck->setChecked(colorChecked);
+            break;
+        }
 		}
 	}
     file.close();
@@ -1032,6 +1160,8 @@ void Table::writeCurrent()
         out << "dayNightParametres = " << dayNightParametres << Qt::endl;
         out << "lastLineDonor = " << lastLineDonor << Qt::endl;
         out << "lastLineRecepient = " << lastLineRecepient << Qt::endl;
+        out << "colorColumnRecepint = " << colorColumnRecepint << Qt::endl;
+        out << "colorChecked = " << colorChecked << Qt::endl;
     }
     else 
     {
@@ -1066,6 +1196,8 @@ void Table::writeCurrentinOtherFile()
     out << "dayNightParametres = " << dayNightParametres << Qt::endl;
     out << "lastLineDonor = " << lastLineDonor << Qt::endl;
     out << "lastLineRecepient = " << lastLineRecepient << Qt::endl;
+    out << "colorColumnRecepint = " << colorColumnRecepint << Qt::endl;
+    out << "colorChecked = " << colorChecked << Qt::endl;
 
     file.close();
 

@@ -10,3 +10,5 @@ refreshChecked = 1
 dayNightParametres = 1
 lastLineDonor = 15
 lastLineRecepient = 15
+colorColumnRecepint = 9
+colorChecked = 1
