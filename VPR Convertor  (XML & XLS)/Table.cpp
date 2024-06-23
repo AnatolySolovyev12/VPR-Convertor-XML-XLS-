@@ -530,11 +530,13 @@ void Table::addRecepient() {
 
 void Table::whatFind()
 {
-    bool ok = true;
+    // bool ok необязательный параметр для inputDialog.getInt(). Откликается на нажатие Ок и Cancel в окне ввода данных. Соответственно становится true или false в зависимости от нажатой кнопки. 
+    // Обязательно надо в начале задать какое то из двух значений чтобы состояния переменно коректно изменялись при нажатии кнопок. Учавствует в качестве указателя в параметрах. Передаём по адресу.
+    bool ok = true; 
     QInputDialog inputDialog;
     QString now = "Specify Search Values. Now ";
     now.append(QString::number(memberWhatFind));
-    int whatFind = inputDialog.getInt(this, "What find?", now, memberWhatFind, 0, 30, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "What find?", now, memberWhatFind, 0, 30, 1, &ok); // принадлежность/приписка над строкой ввода/имя окна/значение сразу введённое в окне/мin/max/шаг изменения значения от нажатия стрелок/bool статус нажатия конкретной кнопки (очень удобно)
     memberWhatFind = whatFind;
 }
 
@@ -1084,8 +1086,3 @@ void Table::refreshAllButtons() // обновляет окно программы до начального состоя
         readyRecepient = false;
     }
 }
-
-
-
-
-

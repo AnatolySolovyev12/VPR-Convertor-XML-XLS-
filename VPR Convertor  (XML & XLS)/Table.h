@@ -111,6 +111,7 @@ private:
 
     QCheckBox* cb;
     QCheckBox* dayNightCheck;
+
     
     /* // Использовался в ранеем варианте VPR. Изменения не отразились на скорости работы алгоритма
     struct vprStruct
@@ -120,5 +121,4 @@ private:
         QVariant valueStruct;
     };
     */
-    
 };

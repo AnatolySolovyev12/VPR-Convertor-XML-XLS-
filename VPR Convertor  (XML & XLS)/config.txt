@@ -8,5 +8,5 @@ memberWhatToInsert = 8
 memberWhereToInsert = 7
 refreshChecked = 1
 dayNightParametres = 1
-lastLineDonor = 30
-lastLineRecepient = 30
+lastLineDonor = 15
+lastLineRecepient = 15
