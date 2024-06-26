@@ -93,7 +93,7 @@ Table::Table(QWidget* parent)
     VboxButtons->addWidget(refresh);
 
     VboxButtons->addWidget(statusBar);
-    VboxButtons->addStretch(1); // равноудаляет от краёв или типо того
+    VboxButtons->addStretch(1);
 
     Hbox->addLayout(Vbox, Qt::AlignRight);
     Hbox->addSpacing(10);
