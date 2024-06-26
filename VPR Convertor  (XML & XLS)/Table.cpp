@@ -35,7 +35,7 @@ Table::Table(QWidget* parent)
 
     paramMenu = new QPushButton("Selecting Options", this);
    // paramMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    pm = new QMenu(paramMenu);
+    pm = new QMenu(paramMenu); // Инициализируем выпадающую кнопку
 
     pm->addAction("&Where find in Donor?", this, &Table::whatFind);
     pm->addAction("&What start Row find in Donor?", this, &Table::RowDoctor);
