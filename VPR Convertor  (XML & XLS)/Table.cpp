@@ -23,7 +23,7 @@ Table::Table(QWidget* parent)
 
     buttConvertToXML = new QPushButton("Convert to XML", this);
     // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    connect(VPR, &QPushButton::clicked, this, &Table::myVPR);
+    connect(buttConvertToXML, &QPushButton::clicked, this, &Table::funcConvertToXML);
 
     donor = new QPushButton("AddDonor", this);
     //donor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1226,6 +1226,32 @@ void Table::refreshAllButtons() // обновл€ет окно программы до начального состо€
 
 void Table::funcConvertToXML()
 {
+    QDate curDate = QDate::currentDate();
+    QTime curTime = QTime::currentTime();
 
+    QString fileName = "80020A__";
+
+    fileName += (curDate.toString("dd.MM.yyyy")) + "__" +(curTime.toString("hh:mm:ss"));
+
+    for (int i = 0; i < fileName.size(); i++)
+    {
+        if (fileName[i].isPunct())
+            fileName.remove(i, 1);
+    }
+
+
+    
+    QString savedFile = QFileDialog::getSaveFileName(0, "Save parameters in other file", fileName, "*.xml");
+
+    if (savedFile == "") return;
+
+    
+    QFile file(savedFile);
+    file.open(QIODevice::WriteOnly);
+    QTextStream out(&file); // поток записываемых данных направл€ем в файл
+
+
+    file.close();
+    
 
 }
