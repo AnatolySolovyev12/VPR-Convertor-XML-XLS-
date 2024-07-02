@@ -44,10 +44,12 @@ private slots:
     void lastLineInRecepient();
     void colorColumnRecepientFunc();
     void checkColorRecepient(int myState);
+    void funcConvertToXML();
 
 private:
 
     QPushButton* VPR = nullptr;
+    QPushButton* buttConvertToXML = nullptr;
     QPushButton* donor = nullptr;
     QPushButton* recepient = nullptr;
     QPushButton* paramMenu = nullptr;

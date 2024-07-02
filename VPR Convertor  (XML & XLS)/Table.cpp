@@ -21,6 +21,10 @@ Table::Table(QWidget* parent)
    // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(VPR, &QPushButton::clicked, this, &Table::myVPR);
 
+    buttConvertToXML = new QPushButton("Convert to XML", this);
+    // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(VPR, &QPushButton::clicked, this, &Table::myVPR);
+
     donor = new QPushButton("AddDonor", this);
     //donor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(donor, &QPushButton::clicked, this, &Table::addDonor);
@@ -85,6 +89,7 @@ Table::Table(QWidget* parent)
     VboxButtons->addWidget(dayNightCheck);
     VboxButtons->addWidget(colorCheck);
     VboxButtons->addWidget(VPR);
+    VboxButtons->addWidget(buttConvertToXML);
     VboxButtons->addWidget(donor);
     VboxButtons->addWidget(recepient);
     VboxButtons->addWidget(loadConfig);
@@ -1217,4 +1222,10 @@ void Table::refreshAllButtons() // обновл€ет окно программы до начального состо€
         delete Table::table2;
         readyRecepient = false;
     }
+}
+
+void Table::funcConvertToXML()
+{
+
+
 }
