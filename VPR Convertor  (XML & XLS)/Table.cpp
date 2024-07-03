@@ -1257,14 +1257,13 @@ void Table::funcConvertToXML()
     xmlWriter.setAutoFormatting(true);
     xmlWriter.writeStartDocument();
 
-    QAxObject* xmlAxObject;
+    QAxObject* xmlAxObject = nullptr;
 
-
+    int forInternalCounter = 0;
     
-    for (int counter = 2; counter <= 6; counter++)
+    for (int counter = 2; counter <= countRowsDonor; counter++)
     {
        
-        
         xmlWriter.writeStartElement("measuringpoint");
 
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 11);
@@ -1276,12 +1275,56 @@ void Table::funcConvertToXML()
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 13);
         xmlWriter.writeAttribute("serial", xmlAxObject->property("Value").toString());
 
-        xmlWriter.writeEndElement();
+        for (int internalCounter = 0; internalCounter < 3; internalCounter++)
+        {
 
-       
+            xmlWriter.writeStartElement("measuringchannel");
+
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 14);
+            xmlWriter.writeAttribute("code", xmlAxObject->property("Value").toString());
+
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 15);
+            xmlWriter.writeAttribute("desc", xmlAxObject->property("Value").toString());
+
+            xmlWriter.writeStartElement("period");
+
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 16);
+            xmlWriter.writeAttribute("start", xmlAxObject->property("Value").toString());
+
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 17);
+            xmlWriter.writeAttribute("end", xmlAxObject->property("Value").toString());
+
+
+
+            xmlWriter.writeStartElement("timestamp");
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 18);
+            xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+            
+            xmlWriter.writeEndElement(); // value ?
+
+
+            xmlWriter.writeStartElement("value");
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 19);
+            xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+            
+            
+            xmlWriter.writeEndElement(); // timestamp ?
+
+
+            xmlWriter.writeEndElement(); /// period
+
+            xmlWriter.writeEndElement(); // measurechannel
+        }
+
+        counter = counter + 2;
+
+
+        xmlWriter.writeEndElement(); // measurepoint
     }
     
     delete xmlAxObject;
+
+    xmlWriter.writeEndDocument();
 
     file.close();
 
