@@ -13,6 +13,9 @@
 #include <algorithm>
 #include <QCheckBox>
 
+#include <QXmlStreamWriter>
+#include <QXmlStreamAttribute>
+
 
 class Table : public QWidget {
 

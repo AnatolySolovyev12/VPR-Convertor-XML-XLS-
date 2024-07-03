@@ -1239,19 +1239,56 @@ void Table::funcConvertToXML()
             fileName.remove(i, 1);
     }
 
-
-    
-    QString savedFile = QFileDialog::getSaveFileName(0, "Save parameters in other file", fileName, "*.xml");
+    QString savedFile = QFileDialog::getSaveFileName(0, "Save XML", fileName, "*.xml"); // ¬ последнем параметре также можно прописать tr("Xml files (*.xml)"). Ёто будет как приписка с указанием формата. ”добно.
 
     if (savedFile == "") return;
 
-    
     QFile file(savedFile);
     file.open(QIODevice::WriteOnly);
-    QTextStream out(&file); // поток записываемых данных направл€ем в файл
 
+    
+    excelDonor = new QAxObject("Excel.Application", 0);// использование самого Excel. ѕри использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. ¬ общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
+    workbooksDonor = excelDonor->querySubObject("Workbooks"); // выбираем книгу
+    workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // выбираем файл с каким работать
+    sheetsDonor = workbookDonor->querySubObject("Worksheets"); // обращаемс€ к листу
+    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor); // выбираем номер листа
+    
+    QXmlStreamWriter xmlWriter(&file);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.writeStartDocument();
+
+    QAxObject* xmlAxObject;
+
+
+    
+    for (int counter = 2; counter <= 6; counter++)
+    {
+       
+        
+        xmlWriter.writeStartElement("measuringpoint");
+
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 11);
+        xmlWriter.writeAttribute("code", xmlAxObject->property("Value").toString());
+
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 12);
+        xmlWriter.writeAttribute("name", xmlAxObject->property("Value").toString());
+
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 13);
+        xmlWriter.writeAttribute("serial", xmlAxObject->property("Value").toString());
+
+        xmlWriter.writeEndElement();
+
+       
+    }
+    
+    delete xmlAxObject;
 
     file.close();
-    
 
+    
+    workbookDonor->dynamicCall("Close()");
+    excelDonor->dynamicCall("Quit()");
+    delete workbookDonor;
+    delete excelDonor;
+    
 }
