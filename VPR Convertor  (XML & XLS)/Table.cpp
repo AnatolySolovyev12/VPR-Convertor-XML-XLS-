@@ -388,7 +388,6 @@ void Table::myVPR()
     delete workbookRecepient;
     delete excelRecepient;
     return;
-
 }
 
 
@@ -1229,7 +1228,7 @@ void Table::funcConvertToXML()
     QDate curDate = QDate::currentDate();
     QTime curTime = QTime::currentTime();
 
-    QString fileName = "80020A__";
+    QString fileName = "80020__";
 
     fileName += (curDate.toString("dd.MM.yyyy")) + "__" +(curTime.toString("hh:mm:ss"));
 
@@ -1243,10 +1242,15 @@ void Table::funcConvertToXML()
 
     if (savedFile == "") return;
 
+    QElapsedTimer timer;
+    int countTimer = 0;
+    timer.start();
+
+    qDebug() << "Wait...";
+
     QFile file(savedFile);
     file.open(QIODevice::WriteOnly);
 
-    
     excelDonor = new QAxObject("Excel.Application", 0);// использование самого Excel. ѕри использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. ¬ общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
     workbooksDonor = excelDonor->querySubObject("Workbooks"); // выбираем книгу
     workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // выбираем файл с каким работать
@@ -1259,11 +1263,61 @@ void Table::funcConvertToXML()
 
     QAxObject* xmlAxObject = nullptr;
 
-    int forInternalCounter = 0;
+    xmlWriter.writeStartElement("message");
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
+    xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString());
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
+    xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
+    xmlWriter.writeAttribute("number", xmlAxObject->property("Value").toString());
+
+    xmlWriter.writeStartElement("datetime");
+
+    xmlWriter.writeStartElement("timestamp");
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 4);
+    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+    xmlWriter.writeEndElement(); // timestamp
+
+    xmlWriter.writeStartElement("daylightsavingtime");
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 5);
+    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+    xmlWriter.writeEndElement(); // daylightsavingtime
+
+    xmlWriter.writeStartElement("day");
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 6);
+    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+    xmlWriter.writeEndElement(); // day
+
+    xmlWriter.writeEndElement(); // datetime
+
+    xmlWriter.writeStartElement("sender");
+
+    xmlWriter.writeStartElement("inn");
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 7);
+    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+    xmlWriter.writeEndElement(); // inn
+
+    xmlWriter.writeStartElement("name");
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 8);
+    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+    xmlWriter.writeEndElement(); // name
+
+    xmlWriter.writeEndElement(); // sender
+
+    xmlWriter.writeStartElement("area");
+
+    xmlWriter.writeStartElement("inn");
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 9);
+    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+    xmlWriter.writeEndElement(); // inn2
+
+    xmlWriter.writeStartElement("name");
+    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 10);
+    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+    xmlWriter.writeEndElement(); // name3
     
     for (int counter = 2; counter <= countRowsDonor; counter++)
     {
-       
         xmlWriter.writeStartElement("measuringpoint");
 
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 11);
@@ -1277,11 +1331,12 @@ void Table::funcConvertToXML()
 
         for (int internalCounter = 0; internalCounter < 3; internalCounter++)
         {
-
             xmlWriter.writeStartElement("measuringchannel");
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 14);
-            xmlWriter.writeAttribute("code", xmlAxObject->property("Value").toString());
+            QString codeStr = xmlAxObject->property("Value").toString();
+            if (codeStr == "1") codeStr = "0"+codeStr;
+            xmlWriter.writeAttribute("code", codeStr);
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 15);
             xmlWriter.writeAttribute("desc", xmlAxObject->property("Value").toString());
@@ -1289,27 +1344,24 @@ void Table::funcConvertToXML()
             xmlWriter.writeStartElement("period");
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 16);
-            xmlWriter.writeAttribute("start", xmlAxObject->property("Value").toString());
+            QString periodStr = xmlAxObject->property("Value").toString();
+            if (periodStr == "0") periodStr = "0000";
+            xmlWriter.writeAttribute("start", periodStr);
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 17);
             xmlWriter.writeAttribute("end", xmlAxObject->property("Value").toString());
-
-
 
             xmlWriter.writeStartElement("timestamp");
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 18);
             xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
             
-            xmlWriter.writeEndElement(); // value ?
-
+            xmlWriter.writeEndElement(); // value
 
             xmlWriter.writeStartElement("value");
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 19);
             xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
             
-            
-            xmlWriter.writeEndElement(); // timestamp ?
-
+            xmlWriter.writeEndElement(); // timestamp
 
             xmlWriter.writeEndElement(); /// period
 
@@ -1318,9 +1370,12 @@ void Table::funcConvertToXML()
 
         counter = counter + 2;
 
-
         xmlWriter.writeEndElement(); // measurepoint
     }
+
+    xmlWriter.writeEndElement(); // area
+
+    xmlWriter.writeEndElement(); // message
     
     delete xmlAxObject;
 
@@ -1328,10 +1383,11 @@ void Table::funcConvertToXML()
 
     file.close();
 
-    
     workbookDonor->dynamicCall("Close()");
     excelDonor->dynamicCall("Quit()");
     delete workbookDonor;
-    delete excelDonor;
-    
+    delete excelDonor;  
+
+    countTimer = timer.elapsed();
+    out << "XLS to XML was convert for = " << (double)countTimer / 1000 << " sec" << Qt::endl;
 }
