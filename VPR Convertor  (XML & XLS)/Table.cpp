@@ -1221,6 +1221,9 @@ void Table::refreshAllButtons() // обновляет окно программы до начального состоя
         delete Table::table2;
         readyRecepient = false;
     }
+
+    xmlEsf = false;
+    xmlZarya = false;
 }
 
 void Table::funcConvertToXML()
@@ -1232,10 +1235,22 @@ void Table::funcConvertToXML()
         return;
     }
 
+    excelDonor = new QAxObject("Excel.Application", 0);// использование самого Excel. При использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. В общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
+    workbooksDonor = excelDonor->querySubObject("Workbooks"); // выбираем книгу
+    workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // выбираем файл с каким работать
+    sheetsDonor = workbookDonor->querySubObject("Worksheets"); // обращаемся к листу
+    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor); // выбираем номер листа
+
+    checkXml();
+
+    if (!xmlEsf && !xmlZarya) return;
+
     QDate curDate = QDate::currentDate();
     QTime curTime = QTime::currentTime();
 
-    QString fileName = "80020__";
+    QString fileName;
+
+    xmlEsf == true ? fileName = "80020__" : fileName = "GUID__";
 
     fileName += (curDate.toString("dd.MM.yyyy")) + "__" +(curTime.toString("hh:mm:ss"));
 
@@ -1257,30 +1272,16 @@ void Table::funcConvertToXML()
 
     QFile file(savedFile);
     file.open(QIODevice::WriteOnly);
-
-    excelDonor = new QAxObject("Excel.Application", 0);// использование самого Excel. При использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. В общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
-    workbooksDonor = excelDonor->querySubObject("Workbooks"); // выбираем книгу
-    workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // выбираем файл с каким работать
-    sheetsDonor = workbookDonor->querySubObject("Worksheets"); // обращаемся к листу
-    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor); // выбираем номер листа
     
-    QXmlStreamWriter xmlWriter(&file);
-    xmlWriter.setAutoFormatting(true);
-    xmlWriter.writeStartDocument();
+    QXmlStreamWriter xmlWriter(&file); // инициализируем объект QXmlStreamWriter ссылкой на объект с которым будем работать
+    xmlWriter.setAutoFormatting(true); // необходимо для автоматического перехода на новую строку
+    xmlWriter.setAutoFormattingIndent(xmlEsf == true ? 1 : 2); // задаём количество пробелов в отступе (по умолчанию 4)
+    xmlWriter.writeStartDocument(); // пишет в шапке кодировку документа
 
     QAxObject* xmlAxObject = nullptr;
 
-    checkXml();
-
-    qDebug() << "xmlEsf = " << xmlEsf;
-    qDebug() << "xmlZarya" << xmlZarya;
-
-    qDebug() << "check 1";
-
     if (xmlEsf)
     {
-        qDebug() << "check 2";
-
         xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
         xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
@@ -1398,7 +1399,6 @@ void Table::funcConvertToXML()
 
     if (xmlZarya)
     {
-        qDebug() << "check 3";
         xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
         xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
@@ -1457,8 +1457,6 @@ void Table::funcConvertToXML()
 
         xmlWriter.writeEndElement(); // message
     }
-
-    qDebug() << "check 4";
     
     delete xmlAxObject;
 
@@ -1471,8 +1469,8 @@ void Table::funcConvertToXML()
     delete workbookDonor;
     delete excelDonor;  
 
-    bool xmlEsf = false;
-    bool xmlZarya = false;
+    xmlEsf = false;
+    xmlZarya = false;
 
     countTimer = timer.elapsed();
     out << "XLS to XML was convert for = " << (double)countTimer / 1000 << " sec" << Qt::endl;
@@ -1486,7 +1484,6 @@ void Table::checkXml()
 
     if (countColsDonor == 14)
     {
-        qDebug() << "countColsDonor = " << countColsDonor;
         for (int column = 1; column <= countColsDonor; column++)
         {
             headOfFile = sheetDonor->querySubObject("Cells(&int,&int)", 1, column);
@@ -1517,7 +1514,6 @@ void Table::checkXml()
         }
         else
         {
-            qDebug() << "count = " << count;
             qDebug() << "Incorrect format Zarya XLS file. Try again with correct file";
             delete headOfFile;
             return;
@@ -1527,7 +1523,6 @@ void Table::checkXml()
 
     if (countColsDonor == 19)
     {
-        qDebug() << "countColsDonor = " << countColsDonor;
         for (int column = 1; column <= countColsDonor; column++)
         {
             headOfFile = sheetDonor->querySubObject("Cells(&int,&int)", 1, column);
@@ -1564,7 +1559,6 @@ void Table::checkXml()
         else
         {
             qDebug() << "Incorrect format Esf XLS file. Try again with correct file";
-            qDebug() << "count = " << count;
             delete headOfFile;
             return;
         }
