@@ -21,7 +21,7 @@ Table::Table(QWidget* parent)
    // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(VPR, &QPushButton::clicked, this, &Table::myVPR);
 
-    buttConvertToXML = new QPushButton("Convert to XML", this);
+    buttConvertToXML = new QPushButton("Convert Donor to XML", this);
     // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(buttConvertToXML, &QPushButton::clicked, this, &Table::funcConvertToXML);
 
@@ -1225,6 +1225,13 @@ void Table::refreshAllButtons() // обновляет окно программы до начального состоя
 
 void Table::funcConvertToXML()
 {
+    if (!Table::readyDonor)
+    {
+        statusBar->showMessage("Add Donor first!", 2000);
+
+        return;
+    }
+
     QDate curDate = QDate::currentDate();
     QTime curTime = QTime::currentTime();
 
@@ -1263,119 +1270,204 @@ void Table::funcConvertToXML()
 
     QAxObject* xmlAxObject = nullptr;
 
-    xmlWriter.writeStartElement("message");
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
-    xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString());
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
-    xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
-    xmlWriter.writeAttribute("number", xmlAxObject->property("Value").toString());
-
-    xmlWriter.writeStartElement("datetime");
-
-    xmlWriter.writeStartElement("timestamp");
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 4);
-    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-    xmlWriter.writeEndElement(); // timestamp
-
-    xmlWriter.writeStartElement("daylightsavingtime");
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 5);
-    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-    xmlWriter.writeEndElement(); // daylightsavingtime
-
-    xmlWriter.writeStartElement("day");
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 6);
-    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-    xmlWriter.writeEndElement(); // day
-
-    xmlWriter.writeEndElement(); // datetime
-
-    xmlWriter.writeStartElement("sender");
-
-    xmlWriter.writeStartElement("inn");
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 7);
-    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-    xmlWriter.writeEndElement(); // inn
-
-    xmlWriter.writeStartElement("name");
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 8);
-    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-    xmlWriter.writeEndElement(); // name
-
-    xmlWriter.writeEndElement(); // sender
-
-    xmlWriter.writeStartElement("area");
-
-    xmlWriter.writeStartElement("inn");
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 9);
-    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-    xmlWriter.writeEndElement(); // inn2
-
-    xmlWriter.writeStartElement("name");
-    xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 10);
-    xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-    xmlWriter.writeEndElement(); // name3
-    
-    for (int counter = 2; counter <= countRowsDonor; counter++)
+    if (xmlEsf)
     {
-        xmlWriter.writeStartElement("measuringpoint");
+        xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
+        xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
+        xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
+        xmlWriter.writeAttribute("number", xmlAxObject->property("Value").toString());
 
-        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 11);
-        xmlWriter.writeAttribute("code", xmlAxObject->property("Value").toString());
+        xmlWriter.writeStartElement("datetime"); // отркывает второй элемент и т.д.
 
-        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 12);
-        xmlWriter.writeAttribute("name", xmlAxObject->property("Value").toString());
+        xmlWriter.writeStartElement("timestamp");
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 4);
+        xmlWriter.writeCharacters(xmlAxObject->property("Value").toString()); //вставка между открытием и закрытием элемента
+        xmlWriter.writeEndElement(); // timestamp
 
-        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 13);
-        xmlWriter.writeAttribute("serial", xmlAxObject->property("Value").toString());
+        xmlWriter.writeStartElement("daylightsavingtime");
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 5);
+        xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        xmlWriter.writeEndElement(); // daylightsavingtime
 
-        for (int internalCounter = 0; internalCounter < 3; internalCounter++)
+        xmlWriter.writeStartElement("day");
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 6);
+        xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        xmlWriter.writeEndElement(); // day
+
+        xmlWriter.writeEndElement(); // datetime
+
+        xmlWriter.writeStartElement("sender");
+
+        xmlWriter.writeStartElement("inn");
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 7);
+        xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        xmlWriter.writeEndElement(); // inn
+
+        xmlWriter.writeStartElement("name");
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 8);
+        xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        xmlWriter.writeEndElement(); // name
+
+        xmlWriter.writeEndElement(); // sender
+
+        xmlWriter.writeStartElement("area");
+
+        xmlWriter.writeStartElement("inn");
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 9);
+        xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        xmlWriter.writeEndElement(); // inn2
+
+        xmlWriter.writeStartElement("name");
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 10);
+        xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        xmlWriter.writeEndElement(); // name3
+
+        for (int counter = 2; counter <= countRowsDonor; counter++)
         {
-            xmlWriter.writeStartElement("measuringchannel");
+            xmlWriter.writeStartElement("measuringpoint");
 
-            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 14);
-            QString codeStr = xmlAxObject->property("Value").toString();
-            if (codeStr == "1") codeStr = "0"+codeStr;
-            xmlWriter.writeAttribute("code", codeStr);
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 11);
+            xmlWriter.writeAttribute("code", xmlAxObject->property("Value").toString());
 
-            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 15);
-            xmlWriter.writeAttribute("desc", xmlAxObject->property("Value").toString());
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 12);
+            xmlWriter.writeAttribute("name", xmlAxObject->property("Value").toString());
 
-            xmlWriter.writeStartElement("period");
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 13);
+            xmlWriter.writeAttribute("serial", xmlAxObject->property("Value").toString());
 
-            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 16);
-            QString periodStr = xmlAxObject->property("Value").toString();
-            if (periodStr == "0") periodStr = "0000";
-            xmlWriter.writeAttribute("start", periodStr);
+            for (int internalCounter = 0; internalCounter < 3; internalCounter++)
+            {
+                xmlWriter.writeStartElement("measuringchannel");
 
-            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 17);
-            xmlWriter.writeAttribute("end", xmlAxObject->property("Value").toString());
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 14);
+                QString codeStr = xmlAxObject->property("Value").toString();
+                if (codeStr == "1") codeStr = "0" + codeStr;
+                xmlWriter.writeAttribute("code", codeStr);
 
-            xmlWriter.writeStartElement("timestamp");
-            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 18);
-            xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-            
-            xmlWriter.writeEndElement(); // value
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 15);
+                xmlWriter.writeAttribute("desc", xmlAxObject->property("Value").toString());
 
-            xmlWriter.writeStartElement("value");
-            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 19);
-            xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-            
-            xmlWriter.writeEndElement(); // timestamp
+                xmlWriter.writeStartElement("period");
 
-            xmlWriter.writeEndElement(); /// period
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 16);
+                QString periodStr = xmlAxObject->property("Value").toString();
+                if (periodStr == "0") periodStr = "0000";
+                xmlWriter.writeAttribute("start", periodStr);
 
-            xmlWriter.writeEndElement(); // measurechannel
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 17);
+                xmlWriter.writeAttribute("end", xmlAxObject->property("Value").toString());
+
+                xmlWriter.writeStartElement("timestamp");
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 18);
+                xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+
+                xmlWriter.writeEndElement(); // value
+
+                xmlWriter.writeStartElement("value");
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 19);
+                xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+
+                xmlWriter.writeEndElement(); // timestamp
+
+                xmlWriter.writeEndElement(); /// period
+
+                xmlWriter.writeEndElement(); // measurechannel
+            }
+
+            counter = counter + 2; // делаем переход через две строки чтобы не дублировать строки с тарифами
+
+            xmlWriter.writeEndElement(); // measurepoint
         }
 
-        counter = counter + 2;
+        xmlWriter.writeEndElement(); // area
 
-        xmlWriter.writeEndElement(); // measurepoint
+        xmlWriter.writeEndElement(); // message
     }
 
-    xmlWriter.writeEndElement(); // area
+    if (xmlZarya)
+    {
+        xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
+        xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
+        xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
+        xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
+        xmlWriter.writeAttribute("datetime", xmlAxObject->property("Value").toString());
 
-    xmlWriter.writeEndElement(); // message
+        for (int counter = 2; counter <= countRowsDonor; counter++)
+        {
+            xmlWriter.writeStartElement("account");
+
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 4);
+            xmlWriter.writeAttribute("street", xmlAxObject->property("Value").toString());
+
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 5);
+            xmlWriter.writeAttribute("house", xmlAxObject->property("Value").toString());
+
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 6);
+            xmlWriter.writeAttribute("flat", xmlAxObject->property("Value").toString());
+
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 7);
+            xmlWriter.writeAttribute("flat", xmlAxObject->property("Value").toString());
+
+
+
+
+
+
+
+
+            for (int internalCounter = 0; internalCounter < 3; internalCounter++)
+            {
+                xmlWriter.writeStartElement("measuringchannel");
+
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 14);
+                QString codeStr = xmlAxObject->property("Value").toString();
+                if (codeStr == "1") codeStr = "0" + codeStr;
+                xmlWriter.writeAttribute("code", codeStr);
+
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 15);
+                xmlWriter.writeAttribute("desc", xmlAxObject->property("Value").toString());
+
+                xmlWriter.writeStartElement("period");
+
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 16);
+                QString periodStr = xmlAxObject->property("Value").toString();
+                if (periodStr == "0") periodStr = "0000";
+                xmlWriter.writeAttribute("start", periodStr);
+
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 17);
+                xmlWriter.writeAttribute("end", xmlAxObject->property("Value").toString());
+
+                xmlWriter.writeStartElement("timestamp");
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 18);
+                xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+
+                xmlWriter.writeEndElement(); // value
+
+                xmlWriter.writeStartElement("value");
+                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 19);
+                xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+
+                xmlWriter.writeEndElement(); // timestamp
+
+                xmlWriter.writeEndElement(); /// period
+
+                xmlWriter.writeEndElement(); // measurechannel
+            }
+
+            counter = counter + 2; // делаем переход через две строки чтобы не дублировать строки с тарифами
+
+            xmlWriter.writeEndElement(); // measurepoint
+        }
+
+        xmlWriter.writeEndElement(); // area
+
+        xmlWriter.writeEndElement(); // message
+    }
     
     delete xmlAxObject;
 
