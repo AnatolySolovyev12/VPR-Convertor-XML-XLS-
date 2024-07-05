@@ -1270,8 +1270,17 @@ void Table::funcConvertToXML()
 
     QAxObject* xmlAxObject = nullptr;
 
+    checkXml();
+
+    qDebug() << "xmlEsf = " << xmlEsf;
+    qDebug() << "xmlZarya" << xmlZarya;
+
+    qDebug() << "check 1";
+
     if (xmlEsf)
     {
+        qDebug() << "check 2";
+
         xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
         xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
@@ -1389,6 +1398,7 @@ void Table::funcConvertToXML()
 
     if (xmlZarya)
     {
+        qDebug() << "check 3";
         xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
         xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
@@ -1411,63 +1421,44 @@ void Table::funcConvertToXML()
             xmlWriter.writeAttribute("flat", xmlAxObject->property("Value").toString());
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 7);
-            xmlWriter.writeAttribute("flat", xmlAxObject->property("Value").toString());
+            xmlWriter.writeAttribute("contract", xmlAxObject->property("Value").toString());
 
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 8);
+            xmlWriter.writeAttribute("numberId", xmlAxObject->property("Value").toString());
 
+            xmlWriter.writeStartElement("counter");
 
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 9);
+            xmlWriter.writeAttribute("number", xmlAxObject->property("Value").toString());
 
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 10);
+            xmlWriter.writeAttribute("typename", xmlAxObject->property("Value").toString());
 
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 11);
+            xmlWriter.writeAttribute("typeid", xmlAxObject->property("Value").toString());
 
+            xmlWriter.writeStartElement("measure");
 
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 12);
+            xmlWriter.writeAttribute("tariff", xmlAxObject->property("Value").toString());
 
-            for (int internalCounter = 0; internalCounter < 3; internalCounter++)
-            {
-                xmlWriter.writeStartElement("measuringchannel");
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 13);
+            xmlWriter.writeAttribute("value", xmlAxObject->property("Value").toString());
 
-                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 14);
-                QString codeStr = xmlAxObject->property("Value").toString();
-                if (codeStr == "1") codeStr = "0" + codeStr;
-                xmlWriter.writeAttribute("code", codeStr);
+            xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 14);
+            xmlWriter.writeAttribute("datetime", xmlAxObject->property("Value").toString());
 
-                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 15);
-                xmlWriter.writeAttribute("desc", xmlAxObject->property("Value").toString());
+            xmlWriter.writeEndElement(); // measure
 
-                xmlWriter.writeStartElement("period");
+            xmlWriter.writeEndElement(); // counter
 
-                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 16);
-                QString periodStr = xmlAxObject->property("Value").toString();
-                if (periodStr == "0") periodStr = "0000";
-                xmlWriter.writeAttribute("start", periodStr);
-
-                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 17);
-                xmlWriter.writeAttribute("end", xmlAxObject->property("Value").toString());
-
-                xmlWriter.writeStartElement("timestamp");
-                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 18);
-                xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-
-                xmlWriter.writeEndElement(); // value
-
-                xmlWriter.writeStartElement("value");
-                xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 19);
-                xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-
-                xmlWriter.writeEndElement(); // timestamp
-
-                xmlWriter.writeEndElement(); /// period
-
-                xmlWriter.writeEndElement(); // measurechannel
-            }
-
-            counter = counter + 2; // делаем переход через две строки чтобы не дублировать строки с тарифами
-
-            xmlWriter.writeEndElement(); // measurepoint
+            xmlWriter.writeEndElement(); // account
         }
-
-        xmlWriter.writeEndElement(); // area
 
         xmlWriter.writeEndElement(); // message
     }
+
+    qDebug() << "check 4";
     
     delete xmlAxObject;
 
@@ -1480,6 +1471,105 @@ void Table::funcConvertToXML()
     delete workbookDonor;
     delete excelDonor;  
 
+    bool xmlEsf = false;
+    bool xmlZarya = false;
+
     countTimer = timer.elapsed();
     out << "XLS to XML was convert for = " << (double)countTimer / 1000 << " sec" << Qt::endl;
+}
+
+void Table::checkXml()
+{
+    QAxObject* headOfFile = nullptr;
+    QString compareStr;
+    int count = 0;
+
+    if (countColsDonor == 14)
+    {
+        qDebug() << "countColsDonor = " << countColsDonor;
+        for (int column = 1; column <= countColsDonor; column++)
+        {
+            headOfFile = sheetDonor->querySubObject("Cells(&int,&int)", 1, column);
+            compareStr = headOfFile->property("Value").toString();
+
+            if (compareStr == "class" && column == 1) count++;
+            if (compareStr == "version" && column == 2) count++;
+            if (compareStr == "datetime" && column == 3) count++;
+            if (compareStr == "street" && column == 4) count++;
+            if (compareStr == "house" && column == 5) count++;
+            if (compareStr == "flat" && column == 6) count++;
+            if (compareStr == "contract" && column == 7) count++;
+            if (compareStr == "numberId" && column == 8) count++;
+            if (compareStr == "number" && column == 9) count++;
+            if (compareStr == "typename" && column == 10) count++;
+            if (compareStr == "typeid" && column == 11) count++;
+            if (compareStr == "tariff" && column == 12) count++;
+            if (compareStr == "value" && column == 13) count++;
+            if (compareStr == "datetime2" && column == 14) count++;
+        }
+
+        if (count == 14)
+        {
+            qDebug() << "XLS convert in Zarya format XML";
+            xmlZarya = true;
+            delete headOfFile;
+            return;
+        }
+        else
+        {
+            qDebug() << "count = " << count;
+            qDebug() << "Incorrect format Zarya XLS file. Try again with correct file";
+            delete headOfFile;
+            return;
+        }
+
+    }
+
+    if (countColsDonor == 19)
+    {
+        qDebug() << "countColsDonor = " << countColsDonor;
+        for (int column = 1; column <= countColsDonor; column++)
+        {
+            headOfFile = sheetDonor->querySubObject("Cells(&int,&int)", 1, column);
+            compareStr = headOfFile->property("Value").toString();
+
+            if (compareStr == "class" && column == 1) count++;
+            if (compareStr == "version" && column == 2) count++;
+            if (compareStr == "number" && column == 3) count++;
+            if (compareStr == "timestamp" && column == 4) count++;
+            if (compareStr == "daylightsavingtime" && column == 5) count++;
+            if (compareStr == "day" && column == 6) count++;
+            if (compareStr == "inn" && column == 7) count++;
+            if (compareStr == "name" && column == 8) count++;
+            if (compareStr == "inn2" && column == 9) count++;
+            if (compareStr == "name3" && column == 10) count++;
+            if (compareStr == "code" && column == 11) count++;
+            if (compareStr == "name4" && column == 12) count++;
+            if (compareStr == "serial" && column == 13) count++;
+            if (compareStr == "code5" && column == 14) count++;
+            if (compareStr == "desc" && column == 15) count++;
+            if (compareStr == "start" && column == 16) count++;
+            if (compareStr == "end" && column == 17) count++;
+            if (compareStr == "timestamp6" && column == 18) count++;
+            if (compareStr == "value" && column == 19) count++;
+        }
+
+        if (count == 19)
+        {
+            qDebug() << "XLS convert in Esf format XML";
+            xmlEsf = true;
+            delete headOfFile;
+            return;
+        }
+        else
+        {
+            qDebug() << "Incorrect format Esf XLS file. Try again with correct file";
+            qDebug() << "count = " << count;
+            delete headOfFile;
+            return;
+        }
+    }
+
+    qDebug() << "Incorrect format XLS file. Try again with correct file";
+    return;
 }

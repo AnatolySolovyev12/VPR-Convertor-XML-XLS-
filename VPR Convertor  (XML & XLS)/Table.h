@@ -48,6 +48,7 @@ private slots:
     void colorColumnRecepientFunc();
     void checkColorRecepient(int myState);
     void funcConvertToXML();
+    void checkXml();
 
 private:
 
@@ -89,6 +90,8 @@ private:
     bool refreshChecked = false;
     bool dayNightParametres = false;
     bool colorChecked = false;
+    bool xmlEsf = false;
+    bool xmlZarya = false;
 
     QString addFileDonor;
     QString addFileRecepient;
