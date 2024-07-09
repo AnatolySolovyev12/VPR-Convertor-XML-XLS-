@@ -1,4 +1,4 @@
-#include "Table.h"
+п»ї#include "Table.h"
 #include <QInputDialog>
 #include <QElapsedTimer>
 #include <QAxWidget>
@@ -39,7 +39,7 @@ Table::Table(QWidget* parent)
 
     paramMenu = new QPushButton("Selecting Options", this);
    // paramMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    pm = new QMenu(paramMenu); // Инициализируем выпадающую кнопку
+    pm = new QMenu(paramMenu); // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РІС‹РїР°РґР°СЋС‰СѓСЋ РєРЅРѕРїРєСѓ
 
     pm->addAction("&Where find in Donor?", this, &Table::whatFind);
     pm->addAction("&What start Row find in Donor?", this, &Table::RowDoctor);
@@ -83,8 +83,8 @@ Table::Table(QWidget* parent)
 
 
 
-    VboxButtons->setSpacing(10); // расстояние между виджетами внутри вертикального бокса
-    VboxButtons->addStretch(1); // равноудаляет от краёв или типо того
+    VboxButtons->setSpacing(10); // СЂР°СЃСЃС‚РѕСЏРЅРёРµ РјРµР¶РґСѓ РІРёРґР¶РµС‚Р°РјРё РІРЅСѓС‚СЂРё РІРµСЂС‚РёРєР°Р»СЊРЅРѕРіРѕ Р±РѕРєСЃР°
+    VboxButtons->addStretch(1); // СЂР°РІРЅРѕСѓРґР°Р»СЏРµС‚ РѕС‚ РєСЂР°С‘РІ РёР»Рё С‚РёРїРѕ С‚РѕРіРѕ
     VboxButtons->addWidget(cb);
     VboxButtons->addWidget(dayNightCheck);
     VboxButtons->addWidget(colorCheck);
@@ -118,11 +118,11 @@ void Table::myVPR()
         return;
     }
 
-    excelDonor = new QAxObject("Excel.Application", 0);// использование самого Excel. При использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. В общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
-    workbooksDonor = excelDonor->querySubObject("Workbooks"); // выбираем книгу
-    workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // выбираем файл с каким работать
-    sheetsDonor = workbookDonor->querySubObject("Worksheets"); // обращаемся к листу
-    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor); // выбираем номер листа
+    excelDonor = new QAxObject("Excel.Application", 0);// РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ СЃР°РјРѕРіРѕ Excel. РџСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРёРё ActiveX РЅР°РґРѕ РїРѕР»Р°РіР°С‚СЊ С‡С‚Рѕ РЅР° РІСЃРµС… С†РµР»РµРІС‹С„С… РјР°С€РёРЅР°С… Р±СѓРґРµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅ Excel. Р’ РѕР±С‰РµРј СѓРєР°Р·С‹РІР°РµРј СЃ РєР°РєРёРј РїСЂРёР»РѕР¶РµРЅРёРµРј Р±СѓРґРµРј СЂР°Р±РѕС‚Р°С‚СЊ (Рє РїСЂРёРјРµСЂСѓ РјРѕРіР»Рѕ Р±С‹С‚СЊ "Outlook.Application")
+    workbooksDonor = excelDonor->querySubObject("Workbooks"); // РІС‹Р±РёСЂР°РµРј РєРЅРёРіСѓ
+    workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // РІС‹Р±РёСЂР°РµРј С„Р°Р№Р» СЃ РєР°РєРёРј СЂР°Р±РѕС‚Р°С‚СЊ
+    sheetsDonor = workbookDonor->querySubObject("Worksheets"); // РѕР±СЂР°С‰Р°РµРјСЃСЏ Рє Р»РёСЃС‚Сѓ
+    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor); // РІС‹Р±РёСЂР°РµРј РЅРѕРјРµСЂ Р»РёСЃС‚Р°
 
     excelRecepient = new QAxObject("Excel.Application", 0);
     workbooksRecepient = excelRecepient->querySubObject("Workbooks");
@@ -148,7 +148,7 @@ void Table::myVPR()
     {
         // QList<vprStruct> tabelDonorFindAndDay;
 
-        QMultiHash<QPair<QString, QString>, QVariant> tabelDonorFindAndDay; // профита нет
+        QMultiHash<QPair<QString, QString>, QVariant> tabelDonorFindAndDay; // РїСЂРѕС„РёС‚Р° РЅРµС‚
 
         for (int counter = memberRowFromFindDonor; counter <= (countRowsDonor - lastLineDonor); counter++)
         {
@@ -197,15 +197,15 @@ void Table::myVPR()
 
                //if ((temporary.whatFindStruct == compareRecepient->property("Value").toString()) && (temporary.dayNightStruct == dayRecepient->property("Value").toString())) 
 
-                if ((it.key().first == compareRecepient->property("Value").toString()) && (it.key().second == dayRecepient->property("Value").toString())) // надо сравнивать QVariant с переводом в QString иначе не сравнивает.
+                if ((it.key().first == compareRecepient->property("Value").toString()) && (it.key().second == dayRecepient->property("Value").toString())) // РЅР°РґРѕ СЃСЂР°РІРЅРёРІР°С‚СЊ QVariant СЃ РїРµСЂРµРІРѕРґРѕРј РІ QString РёРЅР°С‡Рµ РЅРµ СЃСЂР°РІРЅРёРІР°РµС‚.
                 {
                     ++countDoingIterationForTime;
 
                     paste->dynamicCall("SetValue(String)", it.value().toDouble());
 
-                   // tabelDonorFindAndDay.remove(it.key(), it.value()); // удаление записей из хэша (непомогло ускорить процесс)
+                   // tabelDonorFindAndDay.remove(it.key(), it.value()); // СѓРґР°Р»РµРЅРёРµ Р·Р°РїРёСЃРµР№ РёР· С…СЌС€Р° (РЅРµРїРѕРјРѕРіР»Рѕ СѓСЃРєРѕСЂРёС‚СЊ РїСЂРѕС†РµСЃСЃ)
 
-                    qDebug() << "DONE WITH PARAM" << counter; // tabelDonorFindAndDay.count(); - для подсчёта остатков после удаления из хэша записей
+                    qDebug() << "DONE WITH PARAM" << counter; // tabelDonorFindAndDay.count(); - РґР»СЏ РїРѕРґСЃС‡С‘С‚Р° РѕСЃС‚Р°С‚РєРѕРІ РїРѕСЃР»Рµ СѓРґР°Р»РµРЅРёСЏ РёР· С…СЌС€Р° Р·Р°РїРёСЃРµР№
 
                     delete compareRecepient;
                     delete paste;
@@ -215,11 +215,11 @@ void Table::myVPR()
                     {
                         if (negativeValue->property("Value").toDouble() < 0)
                         {
-                            // получаем указатель на её фон
+                            // РїРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РµС‘ С„РѕРЅ
                             QAxObject* interior = negativeValue->querySubObject("Interior");
-                            // устанавливаем цвет
+                            // СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С†РІРµС‚
                             interior->setProperty("Color", QColor("red"));
-                            // освобождение памяти
+                            // РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё
                             delete interior;
                         }
                     }
@@ -233,11 +233,11 @@ void Table::myVPR()
                 {
                     if (negativeValue->property("Value").toDouble() < 0)
                     {
-                        // получаем указатель на её фон
+                        // РїРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РµС‘ С„РѕРЅ
                         QAxObject* interior = negativeValue->querySubObject("Interior");
-                        // устанавливаем цвет
+                        // СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С†РІРµС‚
                         interior->setProperty("Color", QColor("red"));
-                        // освобождение памяти
+                        // РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё
                         delete interior;
                     }
                 }
@@ -300,11 +300,11 @@ void Table::myVPR()
                     {
                         if (negativeValue->property("Value").toDouble() < 0)
                         {
-                            // получаем указатель на её фон
+                            // РїРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РµС‘ С„РѕРЅ
                             QAxObject* interior = negativeValue->querySubObject("Interior");
-                            // устанавливаем цвет
+                            // СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С†РІРµС‚
                             interior->setProperty("Color", QColor("red"));
-                            // освобождение памяти
+                            // РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё
                             delete interior;
                         }
                     }
@@ -319,11 +319,11 @@ void Table::myVPR()
                 {
                     if (negativeValue->property("Value").toDouble() < 0)
                     {
-                        // получаем указатель на её фон
+                        // РїРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РµС‘ С„РѕРЅ
                         QAxObject* interior = negativeValue->querySubObject("Interior");
-                        // устанавливаем цвет
+                        // СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С†РІРµС‚
                         interior->setProperty("Color", QColor("red"));
-                        // освобождение памяти
+                        // РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё
                         delete interior;
                     }
                 }
@@ -355,7 +355,7 @@ void Table::myVPR()
 
     delete Table::table2;
 
-    usedRangeColRecepient = sheetRecepient->querySubObject("UsedRange"); // так можем получить количество столбцов в документе
+    usedRangeColRecepient = sheetRecepient->querySubObject("UsedRange"); // С‚Р°Рє РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚РѕР»Р±С†РѕРІ РІ РґРѕРєСѓРјРµРЅС‚Рµ
     columnsRecepient = usedRangeColRecepient->querySubObject("Columns");
     countColsRecepient = columnsRecepient->property("Count").toInt();
 
@@ -368,7 +368,7 @@ void Table::myVPR()
     for (int row = 0; row < 20; ++row) {
         for (int column = 0; column < countColsRecepient; ++column) {
 
-            cell = sheetRecepient->querySubObject("Cells(int,int)", row + 1, column + 1); // так указываем с какой ячейкой работать
+            cell = sheetRecepient->querySubObject("Cells(int,int)", row + 1, column + 1); // С‚Р°Рє СѓРєР°Р·С‹РІР°РµРј СЃ РєР°РєРѕР№ СЏС‡РµР№РєРѕР№ СЂР°Р±РѕС‚Р°С‚СЊ
             item = new QTableWidgetItem(cell->property("Value").toString());
             table2->setItem(row, column, item);
         }
@@ -426,7 +426,7 @@ void Table::addDonor() {
     workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // 
     sheetsDonor = workbookDonor->querySubObject("Worksheets");
    
-    listDonor = sheetsDonor->property("Count").toInt(); // так можем получить количество листов в документе
+    listDonor = sheetsDonor->property("Count").toInt(); // С‚Р°Рє РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ Р»РёСЃС‚РѕРІ РІ РґРѕРєСѓРјРµРЅС‚Рµ
     
     if (listDonor > 1)
     {
@@ -442,19 +442,19 @@ void Table::addDonor() {
         
     }
 
-    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor);// Тут определяем лист с которым будем работаь
+    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor);// РўСѓС‚ РѕРїСЂРµРґРµР»СЏРµРј Р»РёСЃС‚ СЃ РєРѕС‚РѕСЂС‹Рј Р±СѓРґРµРј СЂР°Р±РѕС‚Р°СЊ
 
     readyDonor = true;
 
-    usedRangeDonor = sheetDonor->querySubObject("UsedRange"); // так можем получить количество строк в документе
+    usedRangeDonor = sheetDonor->querySubObject("UsedRange"); // С‚Р°Рє РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє РІ РґРѕРєСѓРјРµРЅС‚Рµ
     rowsDonor = usedRangeDonor->querySubObject("Rows");
     countRowsDonor = rowsDonor->property("Count").toInt();
 
-    usedRangeColDonor = sheetDonor->querySubObject("UsedRange"); // так можем получить количество столбцов в документе
+    usedRangeColDonor = sheetDonor->querySubObject("UsedRange"); // С‚Р°Рє РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚РѕР»Р±С†РѕРІ РІ РґРѕРєСѓРјРµРЅС‚Рµ
     columnsDonor = usedRangeColDonor->querySubObject("Columns");
     countColsDonor = columnsDonor->property("Count").toInt();
 
-    table = new QTableWidget(20, countColsDonor, this); // создаём тамблицу по размеру той которую открываем в excelDonor
+    table = new QTableWidget(20, countColsDonor, this); // СЃРѕР·РґР°С‘Рј С‚Р°РјР±Р»РёС†Сѓ РїРѕ СЂР°Р·РјРµСЂСѓ С‚РѕР№ РєРѕС‚РѕСЂСѓСЋ РѕС‚РєСЂС‹РІР°РµРј РІ excelDonor
 
     Vbox->addWidget(table);
 
@@ -464,7 +464,7 @@ void Table::addDonor() {
     for (int row = 0; row < 20; ++row) {
         for (int column = 0; column < countColsDonor; ++column) {
 
-            cell = sheetDonor->querySubObject("Cells(int,int)", row + 1, column + 1); // так указываем с какой ячейкой работать
+            cell = sheetDonor->querySubObject("Cells(int,int)", row + 1, column + 1); // С‚Р°Рє СѓРєР°Р·С‹РІР°РµРј СЃ РєР°РєРѕР№ СЏС‡РµР№РєРѕР№ СЂР°Р±РѕС‚Р°С‚СЊ
             item = new QTableWidgetItem(cell->property("Value").toString());
             table->setItem(row, column, item);   
         }  
@@ -484,7 +484,7 @@ void Table::addDonor() {
         qDebug() << "Indent from last line with text in Donor is more than the number of lines of text in Donor. Used default cofiguration.";
     }
 
-    workbookDonor->dynamicCall("Close()"); // обязательно используем в работе с Excel иначе документы будет фbоном открыт в системе
+    workbookDonor->dynamicCall("Close()"); // РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РёСЃРїРѕР»СЊР·СѓРµРј РІ СЂР°Р±РѕС‚Рµ СЃ Excel РёРЅР°С‡Рµ РґРѕРєСѓРјРµРЅС‚С‹ Р±СѓРґРµС‚ С„bРѕРЅРѕРј РѕС‚РєСЂС‹С‚ РІ СЃРёСЃС‚РµРјРµ
     excelDonor->dynamicCall("Quit()");
 
     delete workbookDonor;
@@ -525,12 +525,12 @@ void Table::addRecepient() {
 
     timer.start();
 
-    excelRecepient = new QAxObject("Excel.Application", 0); // использование самого Excel. При использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. В общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
-    workbooksRecepient = excelRecepient->querySubObject("Workbooks"); // Витдимо это орпеделённая API для работы с COM объектом. В Нашем случае с Excel
-    workbookRecepient = workbooksRecepient->querySubObject("Open(const QString&)", addFileRecepient); // Для взаимодействия со вторым файлом обязательно переопредлелять
-    sheetsRecepient = workbookRecepient->querySubObject("Worksheets");// Для взаимодействия со вторым файлом обязательно переопредлелять
+    excelRecepient = new QAxObject("Excel.Application", 0); // РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ СЃР°РјРѕРіРѕ Excel. РџСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРёРё ActiveX РЅР°РґРѕ РїРѕР»Р°РіР°С‚СЊ С‡С‚Рѕ РЅР° РІСЃРµС… С†РµР»РµРІС‹С„С… РјР°С€РёРЅР°С… Р±СѓРґРµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅ Excel. Р’ РѕР±С‰РµРј СѓРєР°Р·С‹РІР°РµРј СЃ РєР°РєРёРј РїСЂРёР»РѕР¶РµРЅРёРµРј Р±СѓРґРµРј СЂР°Р±РѕС‚Р°С‚СЊ (Рє РїСЂРёРјРµСЂСѓ РјРѕРіР»Рѕ Р±С‹С‚СЊ "Outlook.Application")
+    workbooksRecepient = excelRecepient->querySubObject("Workbooks"); // Р’РёС‚РґРёРјРѕ СЌС‚Рѕ РѕСЂРїРµРґРµР»С‘РЅРЅР°СЏ API РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ COM РѕР±СЉРµРєС‚РѕРј. Р’ РќР°С€РµРј СЃР»СѓС‡Р°Рµ СЃ Excel
+    workbookRecepient = workbooksRecepient->querySubObject("Open(const QString&)", addFileRecepient); // Р”Р»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃРѕ РІС‚РѕСЂС‹Рј С„Р°Р№Р»РѕРј РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РїРµСЂРµРѕРїСЂРµРґР»РµР»СЏС‚СЊ
+    sheetsRecepient = workbookRecepient->querySubObject("Worksheets");// Р”Р»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃРѕ РІС‚РѕСЂС‹Рј С„Р°Р№Р»РѕРј РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РїРµСЂРµРѕРїСЂРµРґР»РµР»СЏС‚СЊ
    
-    listRecepient = sheetsRecepient->property("Count").toInt(); // так можем получить количество листов в документе
+    listRecepient = sheetsRecepient->property("Count").toInt(); // С‚Р°Рє РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ Р»РёСЃС‚РѕРІ РІ РґРѕРєСѓРјРµРЅС‚Рµ
 
     if (listRecepient > 1)
     {
@@ -547,13 +547,13 @@ void Table::addRecepient() {
 
     }
     
-    sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);// Для взаимодействия со вторым файлом обязательно переопредлелять
+    sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);// Р”Р»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃРѕ РІС‚РѕСЂС‹Рј С„Р°Р№Р»РѕРј РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РїРµСЂРµРѕРїСЂРµРґР»РµР»СЏС‚СЊ
 
-    usedRangeRecepient = sheetRecepient->querySubObject("UsedRange"); // так можем получить количество строк в документе
+    usedRangeRecepient = sheetRecepient->querySubObject("UsedRange"); // С‚Р°Рє РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє РІ РґРѕРєСѓРјРµРЅС‚Рµ
     rowsRecepient = usedRangeRecepient->querySubObject("Rows");
     countRowsRecepient = rowsRecepient->property("Count").toInt();
 
-    usedRangeColRecepient = sheetRecepient->querySubObject("UsedRange"); // так можем получить количество столбцов в документе
+    usedRangeColRecepient = sheetRecepient->querySubObject("UsedRange"); // С‚Р°Рє РјРѕР¶РµРј РїРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚РѕР»Р±С†РѕРІ РІ РґРѕРєСѓРјРµРЅС‚Рµ
     columnsRecepient = usedRangeColRecepient->querySubObject("Columns");
     countColsRecepient = columnsRecepient->property("Count").toInt();
 
@@ -563,11 +563,11 @@ void Table::addRecepient() {
     QAxObject* cell = nullptr;
     QTableWidgetItem* item = nullptr;
 
-    // Наполняем таблицу 2 значениями из файла 2
+    // РќР°РїРѕР»РЅСЏРµРј С‚Р°Р±Р»РёС†Сѓ 2 Р·РЅР°С‡РµРЅРёСЏРјРё РёР· С„Р°Р№Р»Р° 2
     for (int row = 0; row < 20; ++row) {
         for (int column = 0; column < countColsRecepient; ++column) {
 
-            cell = sheetRecepient->querySubObject("Cells(int,int)", row + 1, column + 1); // так указываем с какой ячейкой работать
+            cell = sheetRecepient->querySubObject("Cells(int,int)", row + 1, column + 1); // С‚Р°Рє СѓРєР°Р·С‹РІР°РµРј СЃ РєР°РєРѕР№ СЏС‡РµР№РєРѕР№ СЂР°Р±РѕС‚Р°С‚СЊ
             item = new QTableWidgetItem(cell->property("Value").toString());
             table2->setItem(row, column, item);
            // delete item;
@@ -599,13 +599,13 @@ void Table::addRecepient() {
 
 void Table::whatFind()
 {
-    // bool ok необязательный параметр для inputDialog.getInt(). Откликается на нажатие Ок и Cancel в окне ввода данных. Соответственно становится true или false в зависимости от нажатой кнопки. 
-    // Обязательно надо в начале задать какое то из двух значений чтобы состояния переменно коректно изменялись при нажатии кнопок. Учавствует в качестве указателя в параметрах. Передаём по адресу.
+    // bool ok РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ РґР»СЏ inputDialog.getInt(). РћС‚РєР»РёРєР°РµС‚СЃСЏ РЅР° РЅР°Р¶Р°С‚РёРµ РћРє Рё Cancel РІ РѕРєРЅРµ РІРІРѕРґР° РґР°РЅРЅС‹С…. РЎРѕРѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕ СЃС‚Р°РЅРѕРІРёС‚СЃСЏ true РёР»Рё false РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РЅР°Р¶Р°С‚РѕР№ РєРЅРѕРїРєРё. 
+    // РћР±СЏР·Р°С‚РµР»СЊРЅРѕ РЅР°РґРѕ РІ РЅР°С‡Р°Р»Рµ Р·Р°РґР°С‚СЊ РєР°РєРѕРµ С‚Рѕ РёР· РґРІСѓС… Р·РЅР°С‡РµРЅРёР№ С‡С‚РѕР±С‹ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕ РєРѕСЂРµРєС‚РЅРѕ РёР·РјРµРЅСЏР»РёСЃСЊ РїСЂРё РЅР°Р¶Р°С‚РёРё РєРЅРѕРїРѕРє. РЈС‡Р°РІСЃС‚РІСѓРµС‚ РІ РєР°С‡РµСЃС‚РІРµ СѓРєР°Р·Р°С‚РµР»СЏ РІ РїР°СЂР°РјРµС‚СЂР°С…. РџРµСЂРµРґР°С‘Рј РїРѕ Р°РґСЂРµСЃСѓ.
     bool ok = true; 
     QInputDialog inputDialog;
     QString now = "Specify Search Values. Now ";
     now.append(QString::number(memberWhatFind));
-    int whatFind = inputDialog.getInt(this, "What find?", now, memberWhatFind, 0, 30, 1, &ok); // принадлежность/приписка над строкой ввода/имя окна/значение сразу введённое в окне/мin/max/шаг изменения значения от нажатия стрелок/bool статус нажатия конкретной кнопки (очень удобно)
+    int whatFind = inputDialog.getInt(this, "What find?", now, memberWhatFind, 0, 30, 1, &ok); // РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚СЊ/РїСЂРёРїРёСЃРєР° РЅР°Рґ СЃС‚СЂРѕРєРѕР№ РІРІРѕРґР°/РёРјСЏ РѕРєРЅР°/Р·РЅР°С‡РµРЅРёРµ СЃСЂР°Р·Сѓ РІРІРµРґС‘РЅРЅРѕРµ РІ РѕРєРЅРµ/Рјin/max/С€Р°Рі РёР·РјРµРЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ РѕС‚ РЅР°Р¶Р°С‚РёСЏ СЃС‚СЂРµР»РѕРє/bool СЃС‚Р°С‚СѓСЃ РЅР°Р¶Р°С‚РёСЏ РєРѕРЅРєСЂРµС‚РЅРѕР№ РєРЅРѕРїРєРё (РѕС‡РµРЅСЊ СѓРґРѕР±РЅРѕ)
     memberWhatFind = whatFind;
 }
 
@@ -763,10 +763,10 @@ void Table::readFileConfig()
 
     int countParam = 0;
 
-    // Считываем файл строка за строкой
+    // РЎС‡РёС‚С‹РІР°РµРј С„Р°Р№Р» СЃС‚СЂРѕРєР° Р·Р° СЃС‚СЂРѕРєРѕР№
     while (!in.atEnd())
-    { // метод atEnd() возвращает true, если в потоке больше нет данных для чтения
-        QString line = in.readLine(); // метод readLine() считывает одну строку из потока
+    { // РјРµС‚РѕРґ atEnd() РІРѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РІ РїРѕС‚РѕРєРµ Р±РѕР»СЊС€Рµ РЅРµС‚ РґР°РЅРЅС‹С… РґР»СЏ С‡С‚РµРЅРёСЏ
+        QString line = in.readLine(); // РјРµС‚РѕРґ readLine() СЃС‡РёС‚С‹РІР°РµС‚ РѕРґРЅСѓ СЃС‚СЂРѕРєСѓ РёР· РїРѕС‚РѕРєР°
         ++countParam;
         QString temporary;
 
@@ -976,10 +976,10 @@ void Table::readDefaultFileConfig()
 
 	int countParam = 0;
 
-	// Считываем файл строка за строкой
+	// РЎС‡РёС‚С‹РІР°РµРј С„Р°Р№Р» СЃС‚СЂРѕРєР° Р·Р° СЃС‚СЂРѕРєРѕР№
 	while (!in.atEnd())
-	{ // метод atEnd() возвращает true, если в потоке больше нет данных для чтения
-		QString line = in.readLine(); // метод readLine() считывает одну строку из потока
+	{ // РјРµС‚РѕРґ atEnd() РІРѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РІ РїРѕС‚РѕРєРµ Р±РѕР»СЊС€Рµ РЅРµС‚ РґР°РЅРЅС‹С… РґР»СЏ С‡С‚РµРЅРёСЏ
+		QString line = in.readLine(); // РјРµС‚РѕРґ readLine() СЃС‡РёС‚С‹РІР°РµС‚ РѕРґРЅСѓ СЃС‚СЂРѕРєСѓ РёР· РїРѕС‚РѕРєР°
 		++countParam;
 		QString temporary;
 
@@ -1147,11 +1147,11 @@ void Table::writeCurrent()
     QString filename = "config.txt";
     QFile file(filename);
     
-    // Открываем файл в режиме "Только для записи"
+    // РћС‚РєСЂС‹РІР°РµРј С„Р°Р№Р» РІ СЂРµР¶РёРјРµ "РўРѕР»СЊРєРѕ РґР»СЏ Р·Р°РїРёСЃРё"
     if (file.open(QIODevice::WriteOnly)) {
-        QTextStream out(&file); // поток записываемых данных направляем в файл
+        QTextStream out(&file); // РїРѕС‚РѕРє Р·Р°РїРёСЃС‹РІР°РµРјС‹С… РґР°РЅРЅС‹С… РЅР°РїСЂР°РІР»СЏРµРј РІ С„Р°Р№Р»
 
-        // Для записи данных в файл используем оператор <<
+        // Р”Р»СЏ Р·Р°РїРёСЃРё РґР°РЅРЅС‹С… РІ С„Р°Р№Р» РёСЃРїРѕР»СЊР·СѓРµРј РѕРїРµСЂР°С‚РѕСЂ <<
         out << "memberWhatFind = " << memberWhatFind << Qt::endl;
         out << "memberRowFromFindDonor = " << memberRowFromFindDonor << Qt::endl;
         out << "memberWhereFind = " << memberWhereFind << Qt::endl;
@@ -1185,9 +1185,9 @@ void Table::writeCurrentinOtherFile()
 
     QFile file(savedFile);
     file.open(QIODevice::WriteOnly);
-    QTextStream out(&file); // поток записываемых данных направляем в файл
+    QTextStream out(&file); // РїРѕС‚РѕРє Р·Р°РїРёСЃС‹РІР°РµРјС‹С… РґР°РЅРЅС‹С… РЅР°РїСЂР°РІР»СЏРµРј РІ С„Р°Р№Р»
 
-    // Для записи данных в файл используем оператор <<
+    // Р”Р»СЏ Р·Р°РїРёСЃРё РґР°РЅРЅС‹С… РІ С„Р°Р№Р» РёСЃРїРѕР»СЊР·СѓРµРј РѕРїРµСЂР°С‚РѕСЂ <<
     out << "memberWhatFind = " << memberWhatFind << Qt::endl;
     out << "memberRowFromFindDonor = " << memberRowFromFindDonor << Qt::endl;
     out << "memberWhereFind = " << memberWhereFind << Qt::endl;
@@ -1208,7 +1208,7 @@ void Table::writeCurrentinOtherFile()
     statusBar->showMessage("New file with parameters was save.", 2000);
 }
 
-void Table::refreshAllButtons() // обновляет окно программы до начального состояния
+void Table::refreshAllButtons() // РѕР±РЅРѕРІР»СЏРµС‚ РѕРєРЅРѕ РїСЂРѕРіСЂР°РјРјС‹ РґРѕ РЅР°С‡Р°Р»СЊРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 {
     if (readyDonor)
     {
@@ -1235,11 +1235,11 @@ void Table::funcConvertToXML()
         return;
     }
 
-    excelDonor = new QAxObject("Excel.Application", 0);// использование самого Excel. При использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. В общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
-    workbooksDonor = excelDonor->querySubObject("Workbooks"); // выбираем книгу
-    workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // выбираем файл с каким работать
-    sheetsDonor = workbookDonor->querySubObject("Worksheets"); // обращаемся к листу
-    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor); // выбираем номер листа
+    excelDonor = new QAxObject("Excel.Application", 0);// РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ СЃР°РјРѕРіРѕ Excel. РџСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРёРё ActiveX РЅР°РґРѕ РїРѕР»Р°РіР°С‚СЊ С‡С‚Рѕ РЅР° РІСЃРµС… С†РµР»РµРІС‹С„С… РјР°С€РёРЅР°С… Р±СѓРґРµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅ Excel. Р’ РѕР±С‰РµРј СѓРєР°Р·С‹РІР°РµРј СЃ РєР°РєРёРј РїСЂРёР»РѕР¶РµРЅРёРµРј Р±СѓРґРµРј СЂР°Р±РѕС‚Р°С‚СЊ (Рє РїСЂРёРјРµСЂСѓ РјРѕРіР»Рѕ Р±С‹С‚СЊ "Outlook.Application")
+    workbooksDonor = excelDonor->querySubObject("Workbooks"); // РІС‹Р±РёСЂР°РµРј РєРЅРёРіСѓ
+    workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // РІС‹Р±РёСЂР°РµРј С„Р°Р№Р» СЃ РєР°РєРёРј СЂР°Р±РѕС‚Р°С‚СЊ
+    sheetsDonor = workbookDonor->querySubObject("Worksheets"); // РѕР±СЂР°С‰Р°РµРјСЃСЏ Рє Р»РёСЃС‚Сѓ
+    sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor); // РІС‹Р±РёСЂР°РµРј РЅРѕРјРµСЂ Р»РёСЃС‚Р°
 
     checkXml();
 
@@ -1260,7 +1260,7 @@ void Table::funcConvertToXML()
             fileName.remove(i, 1);
     }
 
-    QString savedFile = QFileDialog::getSaveFileName(0, "Save XML", fileName, "*.xml"); // В последнем параметре также можно прописать tr("Xml files (*.xml)"). Это будет как приписка с указанием формата. Удобно.
+    QString savedFile = QFileDialog::getSaveFileName(0, "Save XML", fileName, "*.xml"); // Р’ РїРѕСЃР»РµРґРЅРµРј РїР°СЂР°РјРµС‚СЂРµ С‚Р°РєР¶Рµ РјРѕР¶РЅРѕ РїСЂРѕРїРёСЃР°С‚СЊ tr("Xml files (*.xml)"). Р­С‚Рѕ Р±СѓРґРµС‚ РєР°Рє РїСЂРёРїРёСЃРєР° СЃ СѓРєР°Р·Р°РЅРёРµРј С„РѕСЂРјР°С‚Р°. РЈРґРѕР±РЅРѕ.
 
     if (savedFile == "") return;
 
@@ -1273,28 +1273,28 @@ void Table::funcConvertToXML()
     QFile file(savedFile);
     file.open(QIODevice::WriteOnly);
     
-    QXmlStreamWriter xmlWriter(&file); // инициализируем объект QXmlStreamWriter ссылкой на объект с которым будем работать
-    xmlWriter.setAutoFormatting(true); // необходимо для автоматического перехода на новую строку
-    xmlWriter.setAutoFormattingIndent(xmlEsf == true ? 1 : 2); // задаём количество пробелов в отступе (по умолчанию 4)
-    xmlWriter.writeStartDocument(); // пишет в шапке кодировку документа
+    QXmlStreamWriter xmlWriter(&file); // РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РѕР±СЉРµРєС‚ QXmlStreamWriter СЃСЃС‹Р»РєРѕР№ РЅР° РѕР±СЉРµРєС‚ СЃ РєРѕС‚РѕСЂС‹Рј Р±СѓРґРµРј СЂР°Р±РѕС‚Р°С‚СЊ
+    xmlWriter.setAutoFormatting(true); // РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РїРµСЂРµС…РѕРґР° РЅР° РЅРѕРІСѓСЋ СЃС‚СЂРѕРєСѓ
+    xmlWriter.setAutoFormattingIndent(xmlEsf == true ? 1 : 2); // Р·Р°РґР°С‘Рј РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕР±РµР»РѕРІ РІ РѕС‚СЃС‚СѓРїРµ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 4)
+    xmlWriter.writeStartDocument(); // РїРёС€РµС‚ РІ С€Р°РїРєРµ РєРѕРґРёСЂРѕРІРєСѓ РґРѕРєСѓРјРµРЅС‚Р°
 
     QAxObject* xmlAxObject = nullptr;
 
     if (xmlEsf)
     {
-        xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
+        xmlWriter.writeStartElement("message"); // РѕС‚СЂРєС‹РІР°РµС‚ РЅР°С‡Р°Р»СЊРЅС‹Р№ СЌР»РµРјРµРЅС‚ "Р»РµСЃС‚РЅРёС†С‹" xml
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
-        xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
+        xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // РїСЂРёСЃРІР°РёРІР°РµРј Р°С‚СЂРёР±СѓС‚С‹ РІРЅСѓС‚СЂРё РѕС‚РєСЂС‹С‚РѕРіРѕ РїРµСЂРІРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
         xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
         xmlWriter.writeAttribute("number", xmlAxObject->property("Value").toString());
 
-        xmlWriter.writeStartElement("datetime"); // отркывает второй элемент и т.д.
+        xmlWriter.writeStartElement("datetime"); // РѕС‚СЂРєС‹РІР°РµС‚ РІС‚РѕСЂРѕР№ СЌР»РµРјРµРЅС‚ Рё С‚.Рґ.
 
         xmlWriter.writeStartElement("timestamp");
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 4);
-        xmlWriter.writeCharacters(xmlAxObject->property("Value").toString()); //вставка между открытием и закрытием элемента
+        xmlWriter.writeCharacters(xmlAxObject->property("Value").toString()); //РІСЃС‚Р°РІРєР° РјРµР¶РґСѓ РѕС‚РєСЂС‹С‚РёРµРј Рё Р·Р°РєСЂС‹С‚РёРµРј СЌР»РµРјРµРЅС‚Р°
         xmlWriter.writeEndElement(); // timestamp
 
         xmlWriter.writeStartElement("daylightsavingtime");
@@ -1345,8 +1345,32 @@ void Table::funcConvertToXML()
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 12);
             xmlWriter.writeAttribute("name", xmlAxObject->property("Value").toString());
 
+            QString zeroLeaderOne = "в„–0";
+            QString zeroLeaderTwo = "в„–00";
+            QString strName = xmlAxObject->property("Value").toString();
+
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 13);
-            xmlWriter.writeAttribute("serial", xmlAxObject->property("Value").toString());
+            QString strSerial = xmlAxObject->property("Value").toString();
+
+            while (true)
+            {
+                if ((strName.lastIndexOf(zeroLeaderTwo)) != -1) // РѕРїСЂРµРґРµР»СЏРµРј РЅР°Р»РёС‡РёРµ РїРѕРґСЃС‚СЂРѕРєРё РїРѕ РІРѕР·РІСЂР°С‰Р°РµРјРѕРјСѓ РёРЅРґРµРєСЃСѓ. Р•СЃР»Рё РЅРµ -1 С‚Рѕ РїРѕРґС‚РІРµСЂР¶РґР°РµРј РЅР°Р»РёС‡РёРµ Рё РЅРµРѕР±С…РѕРґРёРјРѕ РґРѕСЂРёСЃРѕРІР°С‚СЊ 00 РІ РЅР°С‡Р°Р»Рµ СЃРµСЂР№РёРЅРёРєР°
+                {
+                    qDebug() << "Add 00 for serial: " + strSerial;
+                    strSerial.push_front("00");
+                    break;
+                }
+
+                if ((strName.lastIndexOf(zeroLeaderOne)) != -1) // РѕРїСЂРµРґРµР»СЏРµРј РЅР°Р»РёС‡РёРµ РїРѕРґСЃС‚СЂРѕРєРё РїРѕ РІРѕР·РІСЂР°С‰Р°РµРјРѕРјСѓ РёРЅРґРµРєСЃСѓ. Р•СЃР»Рё РЅРµ -1 С‚Рѕ РїРѕРґС‚РІРµСЂР¶РґР°РµРј РЅР°Р»РёС‡РёРµ Рё РЅРµРѕР±С…РѕРґРёРјРѕ РґРѕСЂРёСЃРѕРІР°С‚СЊ 0 РІ РЅР°С‡Р°Р»Рµ СЃРµСЂР№РёРЅРёРєР°
+                {
+                    qDebug() << "Add 0 for serial: " + strSerial;
+                    strSerial.push_front('0');
+                    break;
+                }
+                break;
+            }
+
+            xmlWriter.writeAttribute("serial", strSerial);
 
             for (int internalCounter = 0; internalCounter < 3; internalCounter++)
             {
@@ -1368,7 +1392,9 @@ void Table::funcConvertToXML()
                 xmlWriter.writeAttribute("start", periodStr);
 
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 17);
-                xmlWriter.writeAttribute("end", xmlAxObject->property("Value").toString());
+                periodStr = xmlAxObject->property("Value").toString();
+                if (periodStr == "0") periodStr = "0000";
+                xmlWriter.writeAttribute("end", periodStr);
 
                 xmlWriter.writeStartElement("timestamp");
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 18);
@@ -1387,7 +1413,7 @@ void Table::funcConvertToXML()
                 xmlWriter.writeEndElement(); // measurechannel
             }
 
-            counter = counter + 2; // делаем переход через две строки чтобы не дублировать строки с тарифами
+            counter = counter + 2; // РґРµР»Р°РµРј РїРµСЂРµС…РѕРґ С‡РµСЂРµР· РґРІРµ СЃС‚СЂРѕРєРё С‡С‚РѕР±С‹ РЅРµ РґСѓР±Р»РёСЂРѕРІР°С‚СЊ СЃС‚СЂРѕРєРё СЃ С‚Р°СЂРёС„Р°РјРё
 
             xmlWriter.writeEndElement(); // measurepoint
         }
@@ -1399,16 +1425,19 @@ void Table::funcConvertToXML()
 
     if (xmlZarya)
     {
-        xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
+        xmlWriter.writeStartElement("message"); // РѕС‚СЂРєС‹РІР°РµС‚ РЅР°С‡Р°Р»СЊРЅС‹Р№ СЌР»РµРјРµРЅС‚ "Р»РµСЃС‚РЅРёС†С‹" xml
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
-        xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
+        xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // РїСЂРёСЃРІР°РёРІР°РµРј Р°С‚СЂРёР±СѓС‚С‹ РІРЅСѓС‚СЂРё РѕС‚РєСЂС‹С‚РѕРіРѕ РїРµСЂРІРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
         xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
         xmlWriter.writeAttribute("datetime", xmlAxObject->property("Value").toString());
 
+      //  int count = 0;
+
         for (int counter = 2; counter <= countRowsDonor; counter++)
         {
+          //  qDebug() << "add #" << count++;
             xmlWriter.writeStartElement("account");
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 4);
