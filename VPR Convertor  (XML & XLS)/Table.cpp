@@ -219,7 +219,7 @@ void Table::myVPR()
                             QAxObject* interior = negativeValue->querySubObject("Interior");
                             // устанавливаем цвет
                             interior->setProperty("Color", QColor("red"));
-                            // освобождение памяти
+  
                             delete interior;
                         }
                     }
@@ -237,7 +237,7 @@ void Table::myVPR()
                         QAxObject* interior = negativeValue->querySubObject("Interior");
                         // устанавливаем цвет
                         interior->setProperty("Color", QColor("red"));
-                        // освобождение памяти
+
                         delete interior;
                     }
                 }
@@ -304,7 +304,7 @@ void Table::myVPR()
                             QAxObject* interior = negativeValue->querySubObject("Interior");
                             // устанавливаем цвет
                             interior->setProperty("Color", QColor("red"));
-                            // освобождение памяти
+
                             delete interior;
                         }
                     }
@@ -323,7 +323,7 @@ void Table::myVPR()
                         QAxObject* interior = negativeValue->querySubObject("Interior");
                         // устанавливаем цвет
                         interior->setProperty("Color", QColor("red"));
-                        // освобождение памяти
+
                         delete interior;
                     }
                 }
@@ -1265,7 +1265,9 @@ void Table::funcConvertToXML()
     if (savedFile == "") return;
 
     QElapsedTimer timer;
-    int countTimer = 0;
+    int countTimer = 0; // для итогового вывода времени потраченного на выполнение
+    int countDoingIterationForTime = 0; // считаем количество выполнений
+    int valueForTimer = 5000; // временной отрезок для подсчёта количества выполнений
     timer.start();
 
     qDebug() << "Wait...";
@@ -1337,6 +1339,8 @@ void Table::funcConvertToXML()
 
         for (int counter = 2; counter <= countRowsDonor; counter++)
         {
+            ++countDoingIterationForTime; // счётчик количества выполнений за единицу времени
+
             xmlWriter.writeStartElement("measuringpoint");
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 11);
@@ -1416,6 +1420,17 @@ void Table::funcConvertToXML()
             counter = counter + 2; // делаем переход через две строки чтобы не дублировать строки с тарифами
 
             xmlWriter.writeEndElement(); // measurepoint
+
+            if (valueForTimer - timer.elapsed() <= 100) // для отслеживания количества выполнений каждые 5 секунд. Видно что замедляется но почему хз?
+            {
+                valueForTimer += 5000;
+
+                QTime ct = QTime::currentTime(); // возвращаем текущее время
+
+                qDebug() << ct.toString() << "   " << countDoingIterationForTime;
+
+                countDoingIterationForTime = 0;
+            }
         }
 
         xmlWriter.writeEndElement(); // area
