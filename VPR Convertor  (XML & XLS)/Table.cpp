@@ -1287,26 +1287,32 @@ void Table::funcConvertToXML()
         xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
         xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
+        delete xmlAxObject;/////
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
         xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
+        delete xmlAxObject;/////
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
         xmlWriter.writeAttribute("number", xmlAxObject->property("Value").toString());
+        delete xmlAxObject;/////
 
         xmlWriter.writeStartElement("datetime"); // отркывает второй элемент и т.д.
 
         xmlWriter.writeStartElement("timestamp");
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 4);
         xmlWriter.writeCharacters(xmlAxObject->property("Value").toString()); //вставка между открытием и закрытием элемента
+        delete xmlAxObject;/////
         xmlWriter.writeEndElement(); // timestamp
 
         xmlWriter.writeStartElement("daylightsavingtime");
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 5);
         xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        delete xmlAxObject;/////
         xmlWriter.writeEndElement(); // daylightsavingtime
 
         xmlWriter.writeStartElement("day");
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 6);
         xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        delete xmlAxObject;/////
         xmlWriter.writeEndElement(); // day
 
         xmlWriter.writeEndElement(); // datetime
@@ -1316,11 +1322,13 @@ void Table::funcConvertToXML()
         xmlWriter.writeStartElement("inn");
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 7);
         xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        delete xmlAxObject;/////
         xmlWriter.writeEndElement(); // inn
 
         xmlWriter.writeStartElement("name");
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 8);
         xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        delete xmlAxObject;/////
         xmlWriter.writeEndElement(); // name
 
         xmlWriter.writeEndElement(); // sender
@@ -1330,11 +1338,13 @@ void Table::funcConvertToXML()
         xmlWriter.writeStartElement("inn");
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 9);
         xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        delete xmlAxObject;/////
         xmlWriter.writeEndElement(); // inn2
 
         xmlWriter.writeStartElement("name");
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 10);
         xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
+        delete xmlAxObject;/////
         xmlWriter.writeEndElement(); // name3
 
         for (int counter = 2; counter <= countRowsDonor; counter++)
@@ -1345,6 +1355,7 @@ void Table::funcConvertToXML()
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 11);
             xmlWriter.writeAttribute("code", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 12);
             xmlWriter.writeAttribute("name", xmlAxObject->property("Value").toString());
@@ -1352,9 +1363,10 @@ void Table::funcConvertToXML()
             QString zeroLeaderOne = "№0";
             QString zeroLeaderTwo = "№00";
             QString strName = xmlAxObject->property("Value").toString();
-
+            delete xmlAxObject;/////
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 13);
             QString strSerial = xmlAxObject->property("Value").toString();
+            delete xmlAxObject;/////
 
             while (true)
             {
@@ -1384,35 +1396,35 @@ void Table::funcConvertToXML()
                 QString codeStr = xmlAxObject->property("Value").toString();
                 if (codeStr == "1") codeStr = "0" + codeStr;
                 xmlWriter.writeAttribute("code", codeStr);
-
+                delete xmlAxObject;/////
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 15);
                 xmlWriter.writeAttribute("desc", xmlAxObject->property("Value").toString());
-
+                delete xmlAxObject;/////
                 xmlWriter.writeStartElement("period");
 
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 16);
                 QString periodStr = xmlAxObject->property("Value").toString();
                 if (periodStr == "0") periodStr = "0000";
                 xmlWriter.writeAttribute("start", periodStr);
-
+                delete xmlAxObject;/////
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 17);
                 periodStr = xmlAxObject->property("Value").toString();
                 if (periodStr == "0") periodStr = "0000";
                 xmlWriter.writeAttribute("end", periodStr);
-
+                delete xmlAxObject;/////
                 xmlWriter.writeStartElement("timestamp");
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 18);
                 xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-
+                delete xmlAxObject;/////
                 xmlWriter.writeEndElement(); // value
 
                 xmlWriter.writeStartElement("value");
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 19);
                 xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
-
+                delete xmlAxObject;/////
                 xmlWriter.writeEndElement(); // timestamp
 
-                xmlWriter.writeEndElement(); /// period
+                xmlWriter.writeEndElement(); // period
 
                 xmlWriter.writeEndElement(); // measurechannel
             }
@@ -1443,66 +1455,88 @@ void Table::funcConvertToXML()
         xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
         xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
+       // delete xmlAxObject;/////
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
         xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
+       // delete xmlAxObject;/////
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
         xmlWriter.writeAttribute("datetime", xmlAxObject->property("Value").toString());
-
-      //  int count = 0;
+      //  delete xmlAxObject;/////
 
         for (int counter = 2; counter <= countRowsDonor; counter++)
         {
-          //  qDebug() << "add #" << count++;
+            ++countDoingIterationForTime;
+
             xmlWriter.writeStartElement("account");
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 4);
             xmlWriter.writeAttribute("street", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 5);
             xmlWriter.writeAttribute("house", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 6);
             xmlWriter.writeAttribute("flat", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 7);
             xmlWriter.writeAttribute("contract", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 8);
             xmlWriter.writeAttribute("numberId", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlWriter.writeStartElement("counter");
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 9);
             xmlWriter.writeAttribute("number", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 10);
             xmlWriter.writeAttribute("typename", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 11);
             xmlWriter.writeAttribute("typeid", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlWriter.writeStartElement("measure");
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 12);
             xmlWriter.writeAttribute("tariff", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 13);
             xmlWriter.writeAttribute("value", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 14);
             xmlWriter.writeAttribute("datetime", xmlAxObject->property("Value").toString());
+            delete xmlAxObject;/////
 
             xmlWriter.writeEndElement(); // measure
 
             xmlWriter.writeEndElement(); // counter
 
             xmlWriter.writeEndElement(); // account
+
+            if (valueForTimer - timer.elapsed() <= 100) // для отслеживания количества выполнений каждые 5 секунд. Видно что замедляется но почему хз?
+            {
+                valueForTimer += 5000;
+
+                QTime ct = QTime::currentTime(); // возвращаем текущее время
+
+                qDebug() << ct.toString() << "   " << countDoingIterationForTime;
+
+                countDoingIterationForTime = 0;
+            }
         }
 
         xmlWriter.writeEndElement(); // message
     }
-    
-    delete xmlAxObject;
 
     xmlWriter.writeEndDocument();
 
@@ -1532,6 +1566,7 @@ void Table::checkXml()
         {
             headOfFile = sheetDonor->querySubObject("Cells(&int,&int)", 1, column);
             compareStr = headOfFile->property("Value").toString();
+            delete headOfFile;
 
             if (compareStr == "class" && column == 1) count++;
             if (compareStr == "version" && column == 2) count++;
@@ -1553,16 +1588,13 @@ void Table::checkXml()
         {
             qDebug() << "XLS convert in Zarya format XML";
             xmlZarya = true;
-            delete headOfFile;
             return;
         }
         else
         {
             qDebug() << "Incorrect format Zarya XLS file. Try again with correct file";
-            delete headOfFile;
             return;
         }
-
     }
 
     if (countColsDonor == 19)
@@ -1571,6 +1603,7 @@ void Table::checkXml()
         {
             headOfFile = sheetDonor->querySubObject("Cells(&int,&int)", 1, column);
             compareStr = headOfFile->property("Value").toString();
+            delete headOfFile;
 
             if (compareStr == "class" && column == 1) count++;
             if (compareStr == "version" && column == 2) count++;
@@ -1597,13 +1630,11 @@ void Table::checkXml()
         {
             qDebug() << "XLS convert in Esf format XML";
             xmlEsf = true;
-            delete headOfFile;
             return;
         }
         else
         {
             qDebug() << "Incorrect format Esf XLS file. Try again with correct file";
-            delete headOfFile;
             return;
         }
     }
