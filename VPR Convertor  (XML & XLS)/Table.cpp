@@ -1288,9 +1288,11 @@ void Table::funcConvertToXML()
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
         xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
         delete xmlAxObject;/////
+
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
         xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
         delete xmlAxObject;/////
+
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
         xmlWriter.writeAttribute("number", xmlAxObject->property("Value").toString());
         delete xmlAxObject;/////
@@ -1364,6 +1366,7 @@ void Table::funcConvertToXML()
             QString zeroLeaderTwo = "№00";
             QString strName = xmlAxObject->property("Value").toString();
             delete xmlAxObject;/////
+
             xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter, 13);
             QString strSerial = xmlAxObject->property("Value").toString();
             delete xmlAxObject;/////
@@ -1397,6 +1400,7 @@ void Table::funcConvertToXML()
                 if (codeStr == "1") codeStr = "0" + codeStr;
                 xmlWriter.writeAttribute("code", codeStr);
                 delete xmlAxObject;/////
+
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 15);
                 xmlWriter.writeAttribute("desc", xmlAxObject->property("Value").toString());
                 delete xmlAxObject;/////
@@ -1407,11 +1411,13 @@ void Table::funcConvertToXML()
                 if (periodStr == "0") periodStr = "0000";
                 xmlWriter.writeAttribute("start", periodStr);
                 delete xmlAxObject;/////
+
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 17);
                 periodStr = xmlAxObject->property("Value").toString();
                 if (periodStr == "0") periodStr = "0000";
                 xmlWriter.writeAttribute("end", periodStr);
                 delete xmlAxObject;/////
+
                 xmlWriter.writeStartElement("timestamp");
                 xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", counter + internalCounter, 18);
                 xmlWriter.writeCharacters(xmlAxObject->property("Value").toString());
@@ -1455,13 +1461,15 @@ void Table::funcConvertToXML()
         xmlWriter.writeStartElement("message"); // отркывает начальный элемент "лестницы" xml
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 1);
         xmlWriter.writeAttribute("class", xmlAxObject->property("Value").toString()); // присваиваем атрибуты внутри открытого первого элемента
-       // delete xmlAxObject;/////
+        delete xmlAxObject;/////
+
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 2);
         xmlWriter.writeAttribute("version", xmlAxObject->property("Value").toString());
-       // delete xmlAxObject;/////
+        delete xmlAxObject;/////
+
         xmlAxObject = sheetDonor->querySubObject("Cells(&int,&int)", 2, 3);
         xmlWriter.writeAttribute("datetime", xmlAxObject->property("Value").toString());
-      //  delete xmlAxObject;/////
+        delete xmlAxObject;/////
 
         for (int counter = 2; counter <= countRowsDonor; counter++)
         {
