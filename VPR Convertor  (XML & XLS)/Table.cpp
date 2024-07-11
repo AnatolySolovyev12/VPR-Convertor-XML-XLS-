@@ -193,10 +193,6 @@ void Table::myVPR()
             {
                it.next();
 
-               //vprStruct temporary = it.next();
-
-               //if ((temporary.whatFindStruct == compareRecepient->property("Value").toString()) && (temporary.dayNightStruct == dayRecepient->property("Value").toString())) 
-
                 if ((it.key().first == compareRecepient->property("Value").toString()) && (it.key().second == dayRecepient->property("Value").toString())) // надо сравнивать QVariant с переводом в QString иначе не сравнивает.
                 {
                     ++countDoingIterationForTime;
@@ -204,8 +200,9 @@ void Table::myVPR()
                     paste->dynamicCall("SetValue(String)", it.value().toDouble());
 
                    // tabelDonorFindAndDay.remove(it.key(), it.value()); // удаление записей из хэша (непомогло ускорить процесс)
+                    // tabelDonorFindAndDay.count(); - для подсчёта остатков после удаления из хэша записей
 
-                    qDebug() << "DONE WITH PARAM" << counter; // tabelDonorFindAndDay.count(); - для подсчёта остатков после удаления из хэша записей
+                    qDebug() << "DONE WITH PARAM" << counter; 
 
                     delete compareRecepient;
                     delete paste;
