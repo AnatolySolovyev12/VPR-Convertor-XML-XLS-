@@ -177,7 +177,7 @@ void Table::myVPR()
             paste = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereToInsert);
             dayRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberwhereDayNightRecepient);
             negativeValue = sheetRecepient->querySubObject("Cells(&int,&int)", counter, colorColumnRecepint);
-
+/*
             while (it.hasNext())
             {
                it.next();
@@ -227,6 +227,37 @@ void Table::myVPR()
                 }
             }
             it.toFront();
+            
+*/
+            QPair <QString, QString> forFind{ compareRecepient->property("Value").toString(), dayRecepient->property("Value").toString() };
+
+            if (tabelDonorFindAndDay.find(forFind) != tabelDonorFindAndDay.constEnd())
+            {
+                ++countDoingIterationForTime;
+
+                paste->dynamicCall("SetValue(double)", (tabelDonorFindAndDay.find(forFind).value()));
+
+                // tabelDonorFindAndDay.remove(it.key(), it.value()); // удаление записей из хэша (непомогло ускорить процесс)
+                 // tabelDonorFindAndDay.count(); - для подсчёта остатков после удаления из хэша записей
+
+                delete compareRecepient;
+                delete paste;
+                delete dayRecepient;
+
+                if (colorChecked)
+                {
+                    if (negativeValue->property("Value").toDouble() < 0)
+                    {
+                        // получаем указатель на её фон
+                        QAxObject* interior = negativeValue->querySubObject("Interior");
+                        // устанавливаем цвет
+                        interior->setProperty("Color", QColor("red"));
+
+                        delete interior;
+                    }
+                }
+                delete negativeValue;
+            }
 
             delete sheetRecepient;
             delete sheetsRecepient;
@@ -243,7 +274,6 @@ void Table::myVPR()
 
                 countDoingIterationForTime = 0;
             }
-
         }
         
         countTimer = timer.elapsed();
@@ -279,6 +309,7 @@ void Table::myVPR()
             paste = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereToInsert);
             negativeValue = sheetRecepient->querySubObject("Cells(&int,&int)", counter, colorColumnRecepint);
 
+            /*
             while (it.hasNext())
             {
                 it.next();
@@ -326,6 +357,33 @@ void Table::myVPR()
 
             }
             it.toFront();
+            */
+
+            // Обновлённый алгоритм поиска совпадающих значений. Профит Кратное увеличение скорости.
+            if (tabelDonorFindAndDay.find(compareRecepient->property("Value").toString()) != tabelDonorFindAndDay.constEnd())
+            {
+                paste->dynamicCall("SetValue(double)", (tabelDonorFindAndDay.find(compareRecepient->property("Value").toString())).value());
+
+                delete compareRecepient;
+                delete paste;
+
+                countDoingIterationForTime++;
+
+                if (colorChecked)
+                {
+                    if (negativeValue->property("Value").toDouble() < 0)
+                    {
+                        // получаем указатель на её фон
+                        QAxObject* interior = negativeValue->querySubObject("Interior");
+                        // устанавливаем цвет
+                        interior->setProperty("Color", QColor("red"));
+
+                        delete interior;
+                    }
+                }
+
+                delete negativeValue;
+            }
 
             delete sheetRecepient;
             delete sheetsRecepient;
