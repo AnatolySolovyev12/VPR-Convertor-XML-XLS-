@@ -131,9 +131,9 @@ void Table::myVPR()
     sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);
 
     QElapsedTimer timer;
-
     int countTimer = 0;
-
+    int countDoingIterationForTime = 0; // считаем количество выполнений
+    int valueForTimer = 5000; // временной отрезок для подсчёта количества выполнений
     timer.start();
 
     QAxObject* copy = nullptr;
@@ -146,7 +146,6 @@ void Table::myVPR()
 
     if (dayNightParametres)
     {
-        // QList<vprStruct> tabelDonorFindAndDay;
 
         QMultiHash<QPair<QString, QString>, QVariant> tabelDonorFindAndDay; // профита нет
 
@@ -156,16 +155,10 @@ void Table::myVPR()
             dayDonor = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberwhereDayNightDonor);
             copy = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatToInsert);
             
-           // QVariant val1 = compareDonor->property("Value").toString();
-           // QVariant val2 = dayDonor->property("Value").toString();
-           // QVariant val3 = copy->property("Value").toString();
-           // vprStruct some = { val1, val2, val3 };
-           // tabelDonorFindAndDay.append(some);
             tabelDonorFindAndDay.insert(QPair<QString, QString>{compareDonor->property("Value").toString(), dayDonor->property("Value").toString()}, copy->property("Value").toString());
             delete compareDonor;
             delete copy;
             delete dayDonor;
-            
         }
 
         countTimer = timer.elapsed();
@@ -176,11 +169,7 @@ void Table::myVPR()
         delete workbookDonor;
         delete excelDonor;
 
-        // QListIterator<vprStruct> it(tabelDonorFindAndDay);
-
         QMultiHashIterator<QPair<QString, QString>, QVariant> it(tabelDonorFindAndDay);
-
-        int countDoingIterationForTime = 0;
 
         for (int counter = memberRowFromFindRecepient; counter <= (countRowsRecepient - lastLineRecepient); counter++)
         {
@@ -201,8 +190,6 @@ void Table::myVPR()
 
                    // tabelDonorFindAndDay.remove(it.key(), it.value()); // удаление записей из хэша (непомогло ускорить процесс)
                     // tabelDonorFindAndDay.count(); - для подсчёта остатков после удаления из хэша записей
-
-                    qDebug() << "DONE WITH PARAM" << counter; 
 
                     delete compareRecepient;
                     delete paste;
@@ -246,6 +233,17 @@ void Table::myVPR()
             sheetsRecepient = workbookRecepient->querySubObject("Worksheets");
             sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);
 
+            if (valueForTimer - timer.elapsed() <= 100) // для отслеживания количества выполнений каждые 5 секунд. Видно что замедляется но почему хз?
+            {
+                valueForTimer += 5000;
+
+                QTime ct = QTime::currentTime(); // возвращаем текущее время
+
+                qDebug() << ct.toString() << "   " << countDoingIterationForTime;
+
+                countDoingIterationForTime = 0;
+            }
+
         }
         
         countTimer = timer.elapsed();
@@ -263,7 +261,6 @@ void Table::myVPR()
             QString val1 = compareDonor->property("Value").toString();
             QString val2 = copy->property("Value").toString();
             tabelDonorFindAndDay.insert(val1, val2);
-
         }
 
         delete compareDonor;
@@ -288,10 +285,13 @@ void Table::myVPR()
 
                 if (it.key() == compareRecepient->property("Value").toString())
                 {
+
                     paste->dynamicCall("SetValue(double)", it.value());
 
                     delete compareRecepient;
                     delete paste;
+
+                    countDoingIterationForTime++;
 
                     if (colorChecked)
                     {
@@ -308,7 +308,6 @@ void Table::myVPR()
 
                     delete negativeValue;
 
-                    qDebug() << "DONE NO PARAM" << counter;
                     break;
                 }
 
@@ -332,6 +331,17 @@ void Table::myVPR()
             delete sheetsRecepient;
             sheetsRecepient = workbookRecepient->querySubObject("Worksheets");
             sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);
+
+            if (valueForTimer - timer.elapsed() <= 100) // для отслеживания количества выполнений каждые 5 секунд. Видно что замедляется но почему хз?
+            {
+                valueForTimer += 5000;
+
+                QTime ct = QTime::currentTime(); // возвращаем текущее время
+
+                qDebug() << ct.toString() << "   " << countDoingIterationForTime;
+
+                countDoingIterationForTime = 0;
+            }
         }
 
         countTimer = timer.elapsed();
