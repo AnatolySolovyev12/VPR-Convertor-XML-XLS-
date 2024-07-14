@@ -952,6 +952,7 @@ void Table::readFileConfig()
             }
             refreshChecked = temporary.toInt();
             qDebug() << "Refresh function after load config = " << refreshChecked;
+            cb->setChecked(refreshChecked);
             break;
         }
         case(10):
@@ -964,6 +965,7 @@ void Table::readFileConfig()
             }
             dayNightParametres = temporary.toInt();
             qDebug() << "Day/Night function after load config = " << dayNightParametres;
+            dayNightCheck->setChecked(dayNightParametres);
             break;
         }
         case(11):
@@ -1016,6 +1018,7 @@ void Table::readFileConfig()
             }
             colorChecked = temporary.toInt();
             qDebug() << "Negative find after load config = " << colorChecked;
+            colorCheck->setChecked(colorChecked);
             break;
         }
         }
