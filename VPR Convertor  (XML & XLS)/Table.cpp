@@ -144,6 +144,8 @@ void Table::myVPR()
     QAxObject* dayRecepient = nullptr;
     QAxObject* negativeValue = nullptr;
 
+    out << "Wait..." << Qt::endl;
+
     if (dayNightParametres)
     {
 
@@ -162,7 +164,8 @@ void Table::myVPR()
         }
 
         countTimer = timer.elapsed();
-        out << "Creating an array finished in = " << (double)countTimer / 1000 << " sec" << Qt::endl;
+
+        qDebug() << "Creating an array finished in =" << (double)countTimer / 1000 << "sec";
 
         workbookDonor->dynamicCall("Close()"); 
         excelDonor->dynamicCall("Quit()");
@@ -270,7 +273,7 @@ void Table::myVPR()
 
                 QTime ct = QTime::currentTime(); // возвращаем текущее время
 
-                qDebug() << ct.toString() << "   " << countDoingIterationForTime;
+                qDebug() << ct.toString() << " " << countDoingIterationForTime;
 
                 countDoingIterationForTime = 0;
             }
@@ -291,10 +294,14 @@ void Table::myVPR()
             QString val1 = compareDonor->property("Value").toString();
             QString val2 = copy->property("Value").toString();
             tabelDonorFindAndDay.insert(val1, val2);
+
+            delete compareDonor;
+            delete copy;
         }
 
-        delete compareDonor;
-        delete copy;
+        countTimer = timer.elapsed();
+
+        qDebug() << "Creating an array finished in =" << (double)countTimer / 1000 << "sec";
 
         workbookDonor->dynamicCall("Close()");
         excelDonor->dynamicCall("Quit()");
@@ -396,7 +403,7 @@ void Table::myVPR()
 
                 QTime ct = QTime::currentTime(); // возвращаем текущее время
 
-                qDebug() << ct.toString() << "   " << countDoingIterationForTime;
+                qDebug() << ct.toString() << " " << countDoingIterationForTime;
 
                 countDoingIterationForTime = 0;
             }
@@ -446,7 +453,7 @@ void Table::myVPR()
 
     countTimer = timer.elapsed();
 
-    out << "Refresh recepient table in = " << (double)countTimer / 1000 << " sec" << Qt::endl;
+    out << "Refresh recepient table" << Qt::endl;
 
     workbookRecepient->dynamicCall("Close()");
     excelRecepient->dynamicCall("Quit()");
@@ -479,12 +486,6 @@ void Table::addDonor() {
     {
         return;
     }
-
-    QElapsedTimer timer;
-
-    int countTimer = 0;
-
-    timer.start();
 
     excelDonor = new QAxObject("Excel.Application", 0); 
     workbooksDonor = excelDonor->querySubObject("Workbooks"); 
@@ -538,9 +539,7 @@ void Table::addDonor() {
     delete cell;
     delete item;
 
-    countTimer = timer.elapsed();
-
-    out << "Add Donor table and file = " << (double)countTimer/1000  <<" sec" << Qt::endl;
+    out << "Add Donor table and file." << Qt::endl;
 
     if (countRowsDonor < lastLineDonor)
     {
@@ -583,12 +582,6 @@ void Table::addRecepient() {
     }
 
     readyRecepient = true;
-
-    QElapsedTimer timer;
-
-    int countTimer = 0;
-
-    timer.start();
 
     excelRecepient = new QAxObject("Excel.Application", 0); // использование самого Excel. При использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. В общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
     workbooksRecepient = excelRecepient->querySubObject("Workbooks"); // Витдимо это орпеделённая API для работы с COM объектом. В Нашем случае с Excel
@@ -642,9 +635,7 @@ void Table::addRecepient() {
     delete cell;
     delete item;
 
-    countTimer = timer.elapsed();
-
-    out << "Add Recepient table and file = " << (double)countTimer / 1000 << " sec" << Qt::endl;
+    out << "Add Recepient table and file." << Qt::endl;
 
     if (countRowsRecepient < lastLineRecepient)
     {
