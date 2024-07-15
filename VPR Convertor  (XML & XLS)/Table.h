@@ -50,6 +50,9 @@ private slots:
     void funcConvertToXML();
     void checkXml();
 
+    void dragEnterEvent(QDragEnterEvent* event);
+    void dropEvent(QDropEvent* event);
+
 private:
 
     QPushButton* VPR = nullptr;
@@ -92,6 +95,7 @@ private:
     bool colorChecked = false;
     bool xmlEsf = false;
     bool xmlZarya = false;
+    bool forDropFunc = false;
 
     QString addFileDonor;
     QString addFileRecepient;

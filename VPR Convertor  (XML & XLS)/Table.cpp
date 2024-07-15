@@ -8,6 +8,11 @@
 
 #include <QPair.h>
 
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
+
+
 QTextStream out(stdout);
 
 Table::Table(QWidget* parent)
@@ -105,6 +110,8 @@ Table::Table(QWidget* parent)
     Hbox->addLayout(VboxButtons, Qt::AlignLeft);
 
     readDefaultFileConfig();
+
+    setAcceptDrops(true); // это свойство определяет включение событий перетаскивания для виджета. true -  можем закидывать. false - не можем.
 }
 
 
@@ -479,8 +486,11 @@ void Table::addDonor() {
 
        return;
    }
-    
-    addFileDonor = QFileDialog::getOpenFileName(0, "Open donor file", "", "*.xls *.xlsx");
+
+   if (!forDropFunc)
+   {
+       addFileDonor = QFileDialog::getOpenFileName(0, "Open donor file", "", "*.xls *.xlsx");
+   }
 
     if (Table::addFileDonor == "")
     {
@@ -573,8 +583,10 @@ void Table::addRecepient() {
         return;
     }
 
-    addFileRecepient = QFileDialog::getOpenFileName(0, "Open donor file", "", "*.xls *.xlsx");
-
+    if (!forDropFunc)
+    {
+        addFileRecepient = QFileDialog::getOpenFileName(0, "Open donor file", "", "*.xls *.xlsx");
+    }
 
     if (Table::addFileRecepient == "")
     {
@@ -582,6 +594,7 @@ void Table::addRecepient() {
     }
 
     readyRecepient = true;
+    setAcceptDrops(false);
 
     excelRecepient = new QAxObject("Excel.Application", 0); // использование самого Excel. При использованиии ActiveX надо полагать что на всех целевыфх машинах будет установлен Excel. В общем указываем с каким приложением будем работать (к примеру могло быть "Outlook.Application")
     workbooksRecepient = excelRecepient->querySubObject("Workbooks"); // Витдимо это орпеделённая API для работы с COM объектом. В Нашем случае с Excel
@@ -1283,6 +1296,8 @@ void Table::refreshAllButtons() // обновляет окно программ�
 
     xmlEsf = false;
     xmlZarya = false;
+
+    setAcceptDrops(true);
 }
 
 void Table::funcConvertToXML()
@@ -1708,4 +1723,31 @@ void Table::checkXml()
 
     qDebug() << "Incorrect format XLS file. Try again with correct file";
     return;
+}
+
+
+void Table::dragEnterEvent(QDragEnterEvent* event) // если что-то затащил в виджет который может принимать то выполняется данный метод.
+{
+    event->accept(); // методи принятия события. 
+}
+
+void Table::dropEvent(QDropEvent* event) // если события перетаскивания было принято то будет выпорлняться данный метод. Без проверок т.к. мы сразу принимаем не разбирая входящее событие.
+{
+    if (!readyDonor && !readyRecepient)
+    {
+        addFileDonor = event->mimeData()->text();
+        forDropFunc = true;
+        addDonor();
+        forDropFunc = false;
+        return;
+    }
+
+    if (readyDonor && !readyRecepient)
+    {
+        addFileRecepient = event->mimeData()->text();
+        forDropFunc = true;
+        addRecepient();
+        forDropFunc = false;
+        setAcceptDrops(false);
+    }
 }
