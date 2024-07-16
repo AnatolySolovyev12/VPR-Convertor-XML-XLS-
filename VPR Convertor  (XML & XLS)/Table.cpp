@@ -187,58 +187,7 @@ void Table::myVPR()
             paste = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereToInsert);
             dayRecepient = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberwhereDayNightRecepient);
             negativeValue = sheetRecepient->querySubObject("Cells(&int,&int)", counter, colorColumnRecepint);
-/*
-            while (it.hasNext())
-            {
-               it.next();
 
-                if ((it.key().first == compareRecepient->property("Value").toString()) && (it.key().second == dayRecepient->property("Value").toString())) // надо сравнивать QVariant с переводом в QString иначе не сравнивает.
-                {
-                    ++countDoingIterationForTime;
-
-                    paste->dynamicCall("SetValue(String)", it.value().toDouble());
-
-                   // tabelDonorFindAndDay.remove(it.key(), it.value()); // удаление записей из хэша (непомогло ускорить процесс)
-                    // tabelDonorFindAndDay.count(); - для подсчёта остатков после удаления из хэша записей
-
-                    delete compareRecepient;
-                    delete paste;
-                    delete dayRecepient;
-
-                    if (colorChecked)
-                    {
-                        if (negativeValue->property("Value").toDouble() < 0)
-                        {
-                            // получаем указатель на её фон
-                            QAxObject* interior = negativeValue->querySubObject("Interior");
-                            // устанавливаем цвет
-                            interior->setProperty("Color", QColor("red"));
-  
-                            delete interior;
-                        }
-                    }
-
-                    delete negativeValue;
-
-                    break;
-                }
-
-                if (colorChecked)
-                {
-                    if (negativeValue->property("Value").toDouble() < 0)
-                    {
-                        // получаем указатель на её фон
-                        QAxObject* interior = negativeValue->querySubObject("Interior");
-                        // устанавливаем цвет
-                        interior->setProperty("Color", QColor("red"));
-
-                        delete interior;
-                    }
-                }
-            }
-            it.toFront();
-            
-*/
             QPair <QString, QString> forFind{ compareRecepient->property("Value").toString(), dayRecepient->property("Value").toString() };
 
             if (tabelDonorFindAndDay.find(forFind) != tabelDonorFindAndDay.constEnd())
@@ -323,55 +272,6 @@ void Table::myVPR()
             paste = sheetRecepient->querySubObject("Cells(&int,&int)", counter, memberWhereToInsert);
             negativeValue = sheetRecepient->querySubObject("Cells(&int,&int)", counter, colorColumnRecepint);
 
-            /*
-            while (it.hasNext())
-            {
-                it.next();
-
-                if (it.key() == compareRecepient->property("Value").toString())
-                {
-
-                    paste->dynamicCall("SetValue(double)", it.value());
-
-                    delete compareRecepient;
-                    delete paste;
-
-                    countDoingIterationForTime++;
-
-                    if (colorChecked)
-                    {
-                        if (negativeValue->property("Value").toDouble() < 0)
-                        {
-                            // получаем указатель на её фон
-                            QAxObject* interior = negativeValue->querySubObject("Interior");
-                            // устанавливаем цвет
-                            interior->setProperty("Color", QColor("red"));
-
-                            delete interior;
-                        }
-                    }
-
-                    delete negativeValue;
-
-                    break;
-                }
-
-                if (colorChecked)
-                {
-                    if (negativeValue->property("Value").toDouble() < 0)
-                    {
-                        // получаем указатель на её фон
-                        QAxObject* interior = negativeValue->querySubObject("Interior");
-                        // устанавливаем цвет
-                        interior->setProperty("Color", QColor("red"));
-
-                        delete interior;
-                    }
-                }
-
-            }
-            it.toFront();
-            */
 
             // Обновлённый алгоритм поиска совпадающих значений. Профит Кратное увеличение скорости.
             if (tabelDonorFindAndDay.find(compareRecepient->property("Value").toString()) != tabelDonorFindAndDay.constEnd())
@@ -1733,21 +1633,43 @@ void Table::dragEnterEvent(QDragEnterEvent* event) // если что-то за�
 
 void Table::dropEvent(QDropEvent* event) // если события перетаскивания было принято то будет выпорлняться данный метод. Без проверок т.к. мы сразу принимаем не разбирая входящее событие.
 {
+    QString writeFormatXls = "xls";
+    QString writeFormatXlsx = "xlsx";
+
     if (!readyDonor && !readyRecepient)
     {
-        addFileDonor = event->mimeData()->text();
-        forDropFunc = true;
-        addDonor();
-        forDropFunc = false;
-        return;
+        addFileDonor = event->mimeData()->text(); // считываем адрес файла в файловой системе и его имя. Как QFileDialog::getOpenFileName только данные из event
+
+        QFileInfo forFormat(addFileDonor);
+        QString name = forFormat.suffix(); // получаем только формат файла по его адресу.
+        qDebug() << name;
+
+        if (name == writeFormatXls || name == writeFormatXlsx)
+        {
+            forDropFunc = true;
+            addDonor();
+            forDropFunc = false;
+            return;
+        }
+        else
+            qDebug() << "Wrong format. Try again.";
     }
 
     if (readyDonor && !readyRecepient)
     {
-        addFileRecepient = event->mimeData()->text();
-        forDropFunc = true;
-        addRecepient();
-        forDropFunc = false;
-        setAcceptDrops(false);
+        QFileInfo forFormat(addFileDonor);
+        QString name = forFormat.suffix();
+        qDebug() << name;
+
+        if (name == writeFormatXls || name == writeFormatXlsx)
+        {
+            addFileRecepient = event->mimeData()->text();
+            forDropFunc = true;
+            addRecepient();
+            forDropFunc = false;
+            setAcceptDrops(false);
+        }
+        else
+            qDebug() << "Wrong format. Try again.";
     }
 }
