@@ -22,51 +22,51 @@ Table::Table(QWidget* parent)
     Vbox = new QVBoxLayout();
     QVBoxLayout* VboxButtons = new QVBoxLayout();
 
-    VPR = new QPushButton("VPR", this);
+    VPR = new QPushButton("ВПР", this);
    // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(VPR, &QPushButton::clicked, this, &Table::myVPR);
 
-    buttConvertToXML = new QPushButton("Convert Donor to XML", this);
+    buttConvertToXML = new QPushButton("Конвертировать донора в XML", this);
     // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(buttConvertToXML, &QPushButton::clicked, this, &Table::funcConvertToXML);
 
-    donor = new QPushButton("AddDonor", this);
+    donor = new QPushButton("Добавить донора", this);
     //donor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(donor, &QPushButton::clicked, this, &Table::addDonor);
 
-    recepient = new QPushButton("AddRecepient", this);
+    recepient = new QPushButton("Добавить реципиента", this);
    // recepient->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(recepient, &QPushButton::clicked, this, &Table::addRecepient);
 
-    loadConfig = new QPushButton("Load config", this);
+    loadConfig = new QPushButton("Загрузить параметры", this);
     // recepient->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(loadConfig, &QPushButton::clicked, this, &Table::readFileConfig);
 
-    paramMenu = new QPushButton("Selecting Options", this);
+    paramMenu = new QPushButton("Установка параметров", this);
    // paramMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     pm = new QMenu(paramMenu); // Инициализируем выпадающую кнопку
 
-    pm->addAction("&Where find in Donor?", this, &Table::whatFind);
-    pm->addAction("&What start Row find in Donor?", this, &Table::RowDoctor);
-    pm->addAction("&Where find in Recepient?", this, &Table::whereFind);
-    pm->addAction("&What start Row find in Recepient?", this, &Table::RowRecepient);
-    pm->addAction("&Where Day/Night of Donor?", this, &Table::whereDayNightDonor);
-    pm->addAction("&Where Day/Night of Recepient?", this, &Table::whereDayNightRecepient);
-    pm->addAction("&What to insert in Donor?", this, &Table::whatToInsert);
-    pm->addAction("&Where to insert in Recepient?", this, &Table::whereToInsert);
-    pm->addAction("&Indent from last line with text in Donor?", this, &Table::lastLineInDonor);
-    pm->addAction("&Indent from last line with text in Recepient?", this, &Table::lastLineInRecepient);
-    pm->addAction("&What column for find negative values?", this, &Table::colorColumnRecepientFunc);
+    pm->addAction("&Какой столбец сравниваем в доноре?", this, &Table::whatFind);
+    pm->addAction("&С какой строки начать сравнение в доноре?", this, &Table::RowDoctor);
+    pm->addAction("&Какой столбец сравниваем в реципиенте?", this, &Table::whereFind);
+    pm->addAction("&С какой строки начать сравнение в реципиенте?", this, &Table::RowRecepient);
+    pm->addAction("&В каком столбце параметр День/Ночь у донора?", this, &Table::whereDayNightDonor);
+    pm->addAction("&В каком столбце параметр День/Ночь у реципиента?", this, &Table::whereDayNightRecepient);
+    pm->addAction("&В каком столбце берем данные у донора?", this, &Table::whatToInsert);
+    pm->addAction("&В каком столбце вставлять данные у реципиента?", this, &Table::whereToInsert);
+    pm->addAction("&На сколько строк от последней прекратить поиск в доноре?", this, &Table::lastLineInDonor);
+    pm->addAction("&На сколько строк от последней прекратить поиск в реципиенте?", this, &Table::lastLineInRecepient);
+    pm->addAction("&В каком столбце ищем негативные значения?", this, &Table::colorColumnRecepientFunc);
 
 
     paramMenu->setMenu(pm);
 
     
-    savedConfig = new QPushButton("Save config", this);
+    savedConfig = new QPushButton("Сохранить параметры", this);
     saveMenu = new QMenu(savedConfig);
 
-    saveMenu->addAction("&Save current parameter as default", this, &Table::writeCurrent);
-    saveMenu->addAction("&Save current parameter in other file", this, &Table::writeCurrentinOtherFile);
+    saveMenu->addAction("&Сделать текущие параметры по умолчанию", this, &Table::writeCurrent);
+    saveMenu->addAction("&Сохранить текущие параметры в другой файл", this, &Table::writeCurrentinOtherFile);
 
     savedConfig->setMenu(saveMenu);
     
@@ -74,16 +74,16 @@ Table::Table(QWidget* parent)
     statusBar = new QStatusBar();
     statusBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    cb = new QCheckBox("Refresh Recepient table after VPR", this);
+    cb = new QCheckBox("Обновить таблицу реципиента после ВПР", this);
     connect(cb, &QCheckBox::stateChanged, this, &Table::checkStateForRefresh);
 
-    dayNightCheck = new QCheckBox("Use Day/Night parameters", this);
+    dayNightCheck = new QCheckBox("Использовать День/Ночь параметр", this);
     connect(dayNightCheck, &QCheckBox::stateChanged, this, &Table::checkDayNight);
 
-    colorCheck = new QCheckBox("Find negative values", this);
+    colorCheck = new QCheckBox("Поиск отрицательных значений", this);
     connect(colorCheck, &QCheckBox::stateChanged, this, &Table::checkColorRecepient);
 
-    refresh = new QPushButton("Refresh", this);
+    refresh = new QPushButton("Обновить", this);
     connect(refresh, &QPushButton::clicked, this, &Table::refreshAllButtons);
 
 
@@ -120,7 +120,7 @@ void Table::myVPR()
 {
     if (!Table::readyDonor || !Table::readyRecepient)
     {
-        statusBar->showMessage("Add Donor first, recepient second!", 2000);
+        statusBar->showMessage("Сперва добавьте донора затем реципиента.", 2000);
 
         return;
     }
@@ -375,21 +375,21 @@ void Table::addDonor() {
 
    if (Table::readyDonor && Table::readyRecepient)
     {
-        statusBar->showMessage("Maybe enough!", 2000);
+        statusBar->showMessage("Необходимо обновить", 2000);
 
         return;
     }
 
    if (Table::readyDonor)
    {
-       statusBar->showMessage("Now addFileDonor recepient!", 2000);
+       statusBar->showMessage("Необходимо добавить реципиента", 2000);
 
        return;
    }
 
    if (!forDropFunc)
    {
-       addFileDonor = QFileDialog::getOpenFileName(0, "Open donor file", "", "*.xls *.xlsx");
+       addFileDonor = QFileDialog::getOpenFileName(0, "Выбор файла донора", "", "*.xls *.xlsx");
    }
 
     if (Table::addFileDonor == "")
@@ -408,7 +408,7 @@ void Table::addDonor() {
     {
         do 
         {
-            listDonor = QInputDialog::getInt(this, "Number of list", "What list do you need?");
+            listDonor = QInputDialog::getInt(this, "Номер листа", "Какой лист вы хотите открыть?");
             if (!listDonor)
             {
                 return;
@@ -471,21 +471,21 @@ void Table::addRecepient() {
 
     if (!Table::readyDonor)
     {
-        statusBar->showMessage("Add Donor first!", 2000);
+        statusBar->showMessage("Необходимо добавить донора", 2000);
 
         return;
     }
 
     if (Table::readyDonor && Table::readyRecepient)
     {
-        statusBar->showMessage("Maybe enough!", 2000);
+        statusBar->showMessage("Необходимо обновить", 2000);
 
         return;
     }
 
     if (!forDropFunc)
     {
-        addFileRecepient = QFileDialog::getOpenFileName(0, "Open donor file", "", "*.xls *.xlsx");
+        addFileRecepient = QFileDialog::getOpenFileName(0, "Выбор файла реципиента", "", "*.xls *.xlsx");
     }
 
     if (Table::addFileRecepient == "")
@@ -507,7 +507,7 @@ void Table::addRecepient() {
     {
         do
         {
-            listRecepient = QInputDialog::getInt(this, "Number of list", "What list do you need?");
+            listRecepient = QInputDialog::getInt(this, "Номер листа", "Какой лист вы хотите открыть?");
 
             if (!listRecepient)
             {
@@ -572,9 +572,9 @@ void Table::whatFind()
     // Обязательно надо в начале задать какое то из двух значений чтобы состояния переменно коректно изменялись при нажатии кнопок. Учавствует в качестве указателя в параметрах. Передаём по адресу.
     bool ok = true; 
     QInputDialog inputDialog;
-    QString now = "Specify Search Values. Now ";
+    QString now = "Задайте столбец поиска. Сейчас ";
     now.append(QString::number(memberWhatFind));
-    int whatFind = inputDialog.getInt(this, "What find?", now, memberWhatFind, 0, 30, 1, &ok); // принадлежность/приписка над строкой ввода/имя окна/значение сразу введённое в окне/мin/max/шаг изменения значения от нажатия стрелок/bool статус нажатия конкретной кнопки (очень удобно)
+    int whatFind = inputDialog.getInt(this, "Где сравниваем?", now, memberWhatFind, 0, 30, 1, &ok); // принадлежность/приписка над строкой ввода/имя окна/значение сразу введённое в окне/мin/max/шаг изменения значения от нажатия стрелок/bool статус нажатия конкретной кнопки (очень удобно)
     memberWhatFind = whatFind;
 }
 
@@ -582,9 +582,9 @@ void Table::RowDoctor()
 {
     bool ok = true;
     QInputDialog inputDialog;
-    QString now = "Specify Search Values. Now ";
+    QString now = "Задайте строку поиска. Сейчас ";
     now.append(QString::number(memberRowFromFindDonor));
-    int whatFind = inputDialog.getInt(this, "What find?", now, memberRowFromFindDonor, 0, 30, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "С какой строки?", now, memberRowFromFindDonor, 0, 30, 1, &ok);
     memberRowFromFindDonor = whatFind;
 }
 
@@ -592,9 +592,9 @@ void Table::whereFind()
 {
     bool ok = true;
     QInputDialog inputDialog;
-    QString now = "Specify Search Values. Now ";
+    QString now = "Задайте столбец поиска. Сейчас ";
     now.append(QString::number(memberWhereFind));
-    int whatFind = inputDialog.getInt(this, "Where find?", now, memberWhereFind, 0, 30, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "Где сравниваем?", now, memberWhereFind, 0, 30, 1, &ok);
     memberWhereFind = whatFind;
 }
 
@@ -602,9 +602,9 @@ void Table::RowRecepient()
 {
     bool ok = true;
     QInputDialog inputDialog;
-    QString now = "Specify Search Values. Now ";
+    QString now = "Задайте строку поиска. Сейчас ";
     now.append(QString::number(memberRowFromFindRecepient));
-    int whatFind = inputDialog.getInt(this, "What find?", now, memberRowFromFindRecepient, 0, 30, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "С какой строки?", now, memberRowFromFindRecepient, 0, 30, 1, &ok);
     memberRowFromFindRecepient = whatFind;
 }
 
@@ -612,9 +612,9 @@ void Table::whereDayNightDonor()
 {
     bool ok = true;
     QInputDialog inputDialog;
-    QString now = "Specify where tariffing. Now ";
+    QString now = "Задайте столбец поиска. Сейчас ";
     now.append(QString::number(memberwhereDayNightDonor));
-    int whatFind = inputDialog.getInt(this, "Where Day/Night?", now, memberwhereDayNightDonor, 0, 30, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "Где сравниваем?", now, memberwhereDayNightDonor, 0, 30, 1, &ok);
     memberwhereDayNightDonor = whatFind;
 }
 
@@ -622,9 +622,9 @@ void Table::whereDayNightRecepient()
 {
     bool ok = true;
     QInputDialog inputDialog;
-    QString now = "Specify where tariffing. Now ";
+    QString now = "Задайте столбец поиска. Сейчас ";
     now.append(QString::number(memberwhereDayNightRecepient));
-    int whatFind = inputDialog.getInt(this, "Where Day/Night?", now, memberwhereDayNightRecepient, 0, 30, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "Где сравниваем?", now, memberwhereDayNightRecepient, 0, 30, 1, &ok);
     memberwhereDayNightRecepient = whatFind;
 }
 
@@ -632,9 +632,9 @@ void Table::whatToInsert()
 {
     bool ok = true;
     QInputDialog inputDialog;
-    QString now = "Specify what to insert. Now ";
+    QString now = "Задайте столбец поиска. Сейчас ";
     now.append(QString::number(memberWhatToInsert));
-    int whatFind = inputDialog.getInt(this, "Where to insert?", now, memberWhatToInsert, 0, 30, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "Что переносим?", now, memberWhatToInsert, 0, 30, 1, &ok);
     memberWhatToInsert = whatFind;
 }
 
@@ -642,9 +642,9 @@ void Table::whereToInsert()
 {
     bool ok = true;
     QInputDialog inputDialog;
-    QString now = "Specify where to insert. Now ";
+    QString now = "Задайте столбец поиска. Сейчас ";
     now.append(QString::number(memberWhereToInsert));
-    int whatFind = inputDialog.getInt(this, "Where to insert?", now, memberWhereToInsert, 0, 30, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "Куда переносим?", now, memberWhereToInsert, 0, 30, 1, &ok);
     memberWhereToInsert = whatFind;
 }
 
@@ -654,9 +654,9 @@ void Table::lastLineInDonor()
     int border = 100;
     if (readyDonor) border = countRowsDonor;
     QInputDialog inputDialog;
-    QString now = "Specify indent from last line with text in Donor. Now ";
+    QString now = "Ограничение поиска с конца на количество строк. Сейчас  ";
     now.append(QString::number(lastLineDonor));
-    int whatFind = inputDialog.getInt(this, "Indent from last line with text?", now, lastLineDonor, 0, border, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "На сколько отступить с конца у донора?", now, lastLineDonor, 0, border, 1, &ok);
     lastLineDonor = whatFind;
 }
 
@@ -666,9 +666,9 @@ void Table::lastLineInRecepient()
     int border = 100;
     if (readyRecepient) border = countRowsRecepient;
     QInputDialog inputDialog;
-    QString now = "Specify indent from last line with text in Recepient. Now ";
+    QString now = "Ограничение поиска с конца на количество строк. Сейчас  ";
     now.append(QString::number(lastLineRecepient));
-    int whatFind = inputDialog.getInt(this, "Indent from last line with text?", now, lastLineRecepient, 0, border, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "На сколько отступить с конца у реципиента?", now, lastLineRecepient, 0, border, 1, &ok);
     lastLineRecepient = whatFind;
 }
 
@@ -676,9 +676,9 @@ void Table::colorColumnRecepientFunc()
 {
     bool ok = true;
     QInputDialog inputDialog;
-    QString now = "Specify where find Negative. Now ";
+    QString now = "Задайте столбец поиска. Сейчас ";
     now.append(QString::number(colorColumnRecepint));
-    int whatFind = inputDialog.getInt(this, "Where find Negative?", now, colorColumnRecepint, 0, 30, 1, &ok);
+    int whatFind = inputDialog.getInt(this, "Где ищем негативные значения?", now, colorColumnRecepint, 0, 30, 1, &ok);
     colorColumnRecepint = whatFind;
 }
 
@@ -714,7 +714,7 @@ void Table::checkColorRecepient(int myState) {
 
 void Table::readFileConfig()
 {
-    QString saved = QFileDialog::getOpenFileName(0, "Load parameters from other file", "", "*.txt");
+    QString saved = QFileDialog::getOpenFileName(0, "Загрузка параметров из другого файла", "", "*.txt");
 
     if (saved == "")
     {
@@ -1146,12 +1146,12 @@ void Table::writeCurrent()
 
     file.close();
 
-    statusBar->showMessage("Default parameters was save.", 2000);
+    statusBar->showMessage("Параметры по умолчанию сохранены.", 2000);
 }
 
 void Table::writeCurrentinOtherFile()
 {
-    QString savedFile = QFileDialog::getSaveFileName(0, "Save parameters in other file", "", "*.txt");
+    QString savedFile = QFileDialog::getSaveFileName(0, "Сохранение параметров в другой файл", "", "*.txt");
 
     if (savedFile == "") return;
 
@@ -1177,7 +1177,7 @@ void Table::writeCurrentinOtherFile()
 
     file.close();
 
-    statusBar->showMessage("New file with parameters was save.", 2000);
+    statusBar->showMessage("Параметры сохранены в новый файл.", 2000);
 }
 
 void Table::refreshAllButtons() // обновляет окно программы до начального состояния
@@ -1204,7 +1204,7 @@ void Table::funcConvertToXML()
 {
     if (!Table::readyDonor)
     {
-        statusBar->showMessage("Add Donor first!", 2000);
+        statusBar->showMessage("Необходимо добавить донора", 2000);
 
         return;
     }
@@ -1234,7 +1234,7 @@ void Table::funcConvertToXML()
             fileName.remove(i, 1);
     }
 
-    QString savedFile = QFileDialog::getSaveFileName(0, "Save XML", fileName, "*.xml"); // В последнем параметре также можно прописать tr("Xml files (*.xml)"). Это будет как приписка с указанием формата. Удобно.
+    QString savedFile = QFileDialog::getSaveFileName(0, "Сохранение XML", fileName, "*.xml"); // В последнем параметре также можно прописать tr("Xml files (*.xml)"). Это будет как приписка с указанием формата. Удобно.
 
     if (savedFile == "") return;
 
