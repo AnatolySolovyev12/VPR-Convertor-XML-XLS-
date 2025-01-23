@@ -1,5 +1,3 @@
-//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup") // убрать консоль при запущенном приложении. Это чтобы не лезть в отладчик.
-
 #include <QApplication>
 #include "table.h"
 
