@@ -23,7 +23,7 @@ Table::Table(QWidget* parent)
     QVBoxLayout* VboxButtons = new QVBoxLayout();
 
     VPR = new QPushButton("ВПР", this);
-   // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    // VPR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(VPR, &QPushButton::clicked, this, &Table::myVPR);
 
     buttConvertToXML = new QPushButton("Конвертировать донора в XML", this);
@@ -31,11 +31,11 @@ Table::Table(QWidget* parent)
     connect(buttConvertToXML, &QPushButton::clicked, this, &Table::funcConvertToXML);
 
     donor = new QPushButton("Добавить донора", this);
-    //donor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //donor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);ч
     connect(donor, &QPushButton::clicked, this, &Table::addDonor);
 
     recepient = new QPushButton("Добавить реципиента", this);
-   // recepient->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    // recepient->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(recepient, &QPushButton::clicked, this, &Table::addRecepient);
 
     loadConfig = new QPushButton("Загрузить параметры", this);
@@ -43,7 +43,7 @@ Table::Table(QWidget* parent)
     connect(loadConfig, &QPushButton::clicked, this, &Table::readFileConfig);
 
     paramMenu = new QPushButton("Установка параметров", this);
-   // paramMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    // paramMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     pm = new QMenu(paramMenu); // Инициализируем выпадающую кнопку
 
     pm->addAction("&Какой столбец сравниваем в доноре?", this, &Table::whatFind);
@@ -61,7 +61,7 @@ Table::Table(QWidget* parent)
 
     paramMenu->setMenu(pm);
 
-    
+
     savedConfig = new QPushButton("Сохранить параметры", this);
     saveMenu = new QMenu(savedConfig);
 
@@ -69,7 +69,7 @@ Table::Table(QWidget* parent)
     saveMenu->addAction("&Сохранить текущие параметры в другой файл", this, &Table::writeCurrentinOtherFile);
 
     savedConfig->setMenu(saveMenu);
-    
+
 
     statusBar = new QStatusBar();
     statusBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -163,7 +163,7 @@ void Table::myVPR()
             compareDonor = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatFind);
             dayDonor = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberwhereDayNightDonor);
             copy = sheetDonor->querySubObject("Cells(auto,auto)", counter, memberWhatToInsert);
-            
+
             tabelDonorFindAndDay.insert(QPair<QString, QString>{compareDonor->property("Value").toString(), dayDonor->property("Value").toString()}, copy->property("Value").toString());
             delete compareDonor;
             delete copy;
@@ -174,7 +174,7 @@ void Table::myVPR()
 
         qDebug() << "Creating an array finished in =" << (double)countTimer / 1000 << "sec";
 
-        workbookDonor->dynamicCall("Close()"); 
+        workbookDonor->dynamicCall("Close()");
         excelDonor->dynamicCall("Quit()");
         delete workbookDonor;
         delete excelDonor;
@@ -234,7 +234,7 @@ void Table::myVPR()
                 countDoingIterationForTime = 0;
             }
         }
-        
+
         countTimer = timer.elapsed();
         out << "VPR finished in = " << (double)countTimer / 1000 << " sec" << Qt::endl;
     }
@@ -373,49 +373,48 @@ void Table::myVPR()
 
 void Table::addDonor() {
 
-   if (Table::readyDonor && Table::readyRecepient)
+    if (Table::readyDonor && Table::readyRecepient)
     {
         statusBar->showMessage("Необходимо обновить", 2000);
 
         return;
     }
 
-   if (Table::readyDonor)
-   {
-       statusBar->showMessage("Необходимо добавить реципиента", 2000);
+    if (Table::readyDonor)
+    {
+        statusBar->showMessage("Необходимо добавить реципиента", 2000);
 
-       return;
-   }
+        return;
+    }
 
-   if (!forDropFunc)
-   {
-       addFileDonor = QFileDialog::getOpenFileName(0, "Выбор файла донора", "", "*.xls *.xlsx");
-   }
+    if (!forDropFunc)
+    {
+        addFileDonor = QFileDialog::getOpenFileName(0, "Выбор файла донора", "", "*.xls *.xlsx");
+    }
 
     if (Table::addFileDonor == "")
     {
         return;
     }
 
-    excelDonor = new QAxObject("Excel.Application", 0); 
-    workbooksDonor = excelDonor->querySubObject("Workbooks"); 
+    excelDonor = new QAxObject("Excel.Application", 0);
+    workbooksDonor = excelDonor->querySubObject("Workbooks");
     workbookDonor = workbooksDonor->querySubObject("Open(const QString&)", addFileDonor); // 
     sheetsDonor = workbookDonor->querySubObject("Worksheets");
-   
+
     listDonor = sheetsDonor->property("Count").toInt(); // так можем получить количество листов в документе
-    
+
     if (listDonor > 1)
     {
-        do 
+        do
         {
             listDonor = QInputDialog::getInt(this, "Номер листа", "Какой лист вы хотите открыть?");
             if (!listDonor)
             {
                 return;
             }
-        } 
-        while (listDonor <= 0 || (listDonor > (sheetsDonor->property("Count").toInt())));
-        
+        } while (listDonor <= 0 || (listDonor > (sheetsDonor->property("Count").toInt())));
+
     }
 
     sheetDonor = sheetsDonor->querySubObject("Item(int)", listDonor);// Тут определяем лист с которым будем работаь
@@ -442,8 +441,8 @@ void Table::addDonor() {
 
             cell = sheetDonor->querySubObject("Cells(int,int)", row + 1, column + 1); // так указываем с какой ячейкой работать
             item = new QTableWidgetItem(cell->property("Value").toString());
-            table->setItem(row, column, item);   
-        }  
+            table->setItem(row, column, item);
+        }
     }
 
     delete cell;
@@ -500,7 +499,7 @@ void Table::addRecepient() {
     workbooksRecepient = excelRecepient->querySubObject("Workbooks"); // Витдимо это орпеделённая API для работы с COM объектом. В Нашем случае с Excel
     workbookRecepient = workbooksRecepient->querySubObject("Open(const QString&)", addFileRecepient); // Для взаимодействия со вторым файлом обязательно переопредлелять
     sheetsRecepient = workbookRecepient->querySubObject("Worksheets");// Для взаимодействия со вторым файлом обязательно переопредлелять
-   
+
     listRecepient = sheetsRecepient->property("Count").toInt(); // так можем получить количество листов в документе
 
     if (listRecepient > 1)
@@ -517,7 +516,7 @@ void Table::addRecepient() {
         } while (listRecepient <= 0 || (listRecepient > (sheetsRecepient->property("Count").toInt())));
 
     }
-    
+
     sheetRecepient = sheetsRecepient->querySubObject("Item(int)", listRecepient);// Для взаимодействия со вторым файлом обязательно переопредлелять
 
     usedRangeRecepient = sheetRecepient->querySubObject("UsedRange"); // так можем получить количество строк в документе
@@ -541,7 +540,7 @@ void Table::addRecepient() {
             cell = sheetRecepient->querySubObject("Cells(int,int)", row + 1, column + 1); // так указываем с какой ячейкой работать
             item = new QTableWidgetItem(cell->property("Value").toString());
             table2->setItem(row, column, item);
-           // delete item;
+            // delete item;
         }
     }
 
@@ -570,7 +569,7 @@ void Table::whatFind()
 {
     // bool ok необязательный параметр для inputDialog.getInt(). Откликается на нажатие Ок и Cancel в окне ввода данных. Соответственно становится true или false в зависимости от нажатой кнопки. 
     // Обязательно надо в начале задать какое то из двух значений чтобы состояния переменно коректно изменялись при нажатии кнопок. Учавствует в качестве указателя в параметрах. Передаём по адресу.
-    bool ok = true; 
+    bool ok = true;
     QInputDialog inputDialog;
     QString now = "Задайте столбец поиска. Сейчас ";
     now.append(QString::number(memberWhatFind));
@@ -938,44 +937,44 @@ void Table::readDefaultFileConfig()
     QString filename = "config.txt";
     QFile file(filename);
 
-	if (!file.open(QIODevice::ReadOnly))
-	{
-		out << "Dont fide config file. Used default cofiguration." << Qt::endl;
-		return;
-	}
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        out << "Dont fide config file. Used default cofiguration." << Qt::endl;
+        return;
+    }
 
-	QTextStream in(&file);
+    QTextStream in(&file);
 
-	int countParam = 0;
+    int countParam = 0;
 
-	// Считываем файл строка за строкой
-	while (!in.atEnd())
-	{ // метод atEnd() возвращает true, если в потоке больше нет данных для чтения
-		QString line = in.readLine(); // метод readLine() считывает одну строку из потока
-		++countParam;
-		QString temporary;
+    // Считываем файл строка за строкой
+    while (!in.atEnd())
+    { // метод atEnd() возвращает true, если в потоке больше нет данных для чтения
+        QString line = in.readLine(); // метод readLine() считывает одну строку из потока
+        ++countParam;
+        QString temporary;
 
-		for (auto& val : line)
-		{ 
-			if (val.isDigit())
-			{
-				temporary += val;
-			}
-		}
+        for (auto& val : line)
+        {
+            if (val.isDigit())
+            {
+                temporary += val;
+            }
+        }
 
-		switch (countParam)
-		{
+        switch (countParam)
+        {
 
-		case(1):
-		{
+        case(1):
+        {
             if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
             {
                 qDebug() << "Parameter in file going beyond borders! Default value will be used.";
                 break;
             }
-			memberWhatFind = temporary.toInt();
-			break;
-		}
+            memberWhatFind = temporary.toInt();
+            break;
+        }
         case(2):
         {
             if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
@@ -986,16 +985,16 @@ void Table::readDefaultFileConfig()
             memberRowFromFindDonor = temporary.toInt();
             break;
         }
-		case(3):
-		{
+        case(3):
+        {
             if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
             {
                 qDebug() << "Parameter in file going beyond borders! Default value will be used.";
                 break;
             }
-			memberWhereFind = temporary.toInt();
-			break;
-		}
+            memberWhereFind = temporary.toInt();
+            break;
+        }
         case(4):
         {
             if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
@@ -1006,46 +1005,46 @@ void Table::readDefaultFileConfig()
             memberRowFromFindRecepient = temporary.toInt();
             break;
         }
-		case(5):
-		{
+        case(5):
+        {
             if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
             {
                 qDebug() << "Parameter in file going beyond borders! Default value will be used.";
                 break;
             }
-			memberwhereDayNightDonor = temporary.toInt();
-			break;
-		}
-		case(6):
-		{
+            memberwhereDayNightDonor = temporary.toInt();
+            break;
+        }
+        case(6):
+        {
             if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
             {
                 qDebug() << "Parameter in file going beyond borders! Default value will be used.";
                 break;
             }
-			memberwhereDayNightRecepient = temporary.toInt();
-			break;
-		}
-		case(7):
-		{
+            memberwhereDayNightRecepient = temporary.toInt();
+            break;
+        }
+        case(7):
+        {
             if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
             {
                 qDebug() << "Parameter in file going beyond borders! Default value will be used.";
                 break;
             }
-			memberWhatToInsert = temporary.toInt();
-			break;
-		}
-		case(8):
-		{
+            memberWhatToInsert = temporary.toInt();
+            break;
+        }
+        case(8):
+        {
             if ((temporary.toInt() < 1) || (temporary.toInt() > 30))
             {
                 qDebug() << "Parameter in file going beyond borders! Default value will be used.";
                 break;
             }
-			memberWhereToInsert = temporary.toInt();
-			break;
-		}
+            memberWhereToInsert = temporary.toInt();
+            break;
+        }
         case(9):
         {
             if ((temporary.toInt() < 0) || (temporary.toInt() > 1))
@@ -1109,8 +1108,8 @@ void Table::readDefaultFileConfig()
             colorCheck->setChecked(colorChecked);
             break;
         }
-		}
-	}
+        }
+    }
     file.close();
 }
 
@@ -1118,7 +1117,7 @@ void Table::writeCurrent()
 {
     QString filename = "config.txt";
     QFile file(filename);
-    
+
     // Открываем файл в режиме "Только для записи"
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream out(&file); // поток записываемых данных направляем в файл
@@ -1139,7 +1138,7 @@ void Table::writeCurrent()
         out << "colorColumnRecepint = " << colorColumnRecepint << Qt::endl;
         out << "colorChecked = " << colorChecked << Qt::endl;
     }
-    else 
+    else
     {
         qWarning("Could not open file");
     }
@@ -1217,7 +1216,16 @@ void Table::funcConvertToXML()
 
     checkXml();
 
-    if (!xmlEsf && !xmlZarya) return;
+    if (!xmlEsf && !xmlZarya)
+    {
+        workbookDonor->dynamicCall("Close()");
+        excelDonor->dynamicCall("Quit()");
+
+        delete workbookDonor;
+        delete excelDonor;
+
+        return;
+    }
 
     QDate curDate = QDate::currentDate();
     QTime curTime = QTime::currentTime();
@@ -1226,7 +1234,7 @@ void Table::funcConvertToXML()
 
     xmlEsf == true ? fileName = "80020__" : fileName = "GUID__";
 
-    fileName += (curDate.toString("dd.MM.yyyy")) + "__" +(curTime.toString("hh:mm:ss"));
+    fileName += (curDate.toString("dd.MM.yyyy")) + "__" + (curTime.toString("hh:mm:ss"));
 
     for (int i = 0; i < fileName.size(); i++)
     {
@@ -1248,7 +1256,7 @@ void Table::funcConvertToXML()
 
     QFile file(savedFile);
     file.open(QIODevice::WriteOnly);
-    
+
     QXmlStreamWriter xmlWriter(&file); // инициализируем объект QXmlStreamWriter ссылкой на объект с которым будем работать
     xmlWriter.setAutoFormatting(true); // необходимо для автоматического перехода на новую строку
     xmlWriter.setAutoFormattingIndent(xmlEsf == true ? 1 : 2); // задаём количество пробелов в отступе (по умолчанию 4)
@@ -1527,7 +1535,7 @@ void Table::funcConvertToXML()
     workbookDonor->dynamicCall("Close()");
     excelDonor->dynamicCall("Quit()");
     delete workbookDonor;
-    delete excelDonor;  
+    delete excelDonor;
 
     xmlEsf = false;
     xmlZarya = false;
