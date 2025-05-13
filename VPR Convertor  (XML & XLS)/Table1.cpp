@@ -202,21 +202,21 @@ void Table::myVPR()
                 delete compareRecepient;
                 delete paste;
                 delete dayRecepient;
-            }
 
-            if (colorChecked)
-            {
-                if (negativeValue->property("Value").toDouble() < 0)
+                if (colorChecked)
                 {
-                    // получаем указатель на её фон
-                    QAxObject* interior = negativeValue->querySubObject("Interior");
-                    // устанавливаем цвет
-                    interior->setProperty("Color", QColor("red"));
+                    if (negativeValue->property("Value").toDouble() < 0)
+                    {
+                        // получаем указатель на её фон
+                        QAxObject* interior = negativeValue->querySubObject("Interior");
+                        // устанавливаем цвет
+                        interior->setProperty("Color", QColor("red"));
 
-                    delete interior;
+                        delete interior;
+                    }
                 }
+                delete negativeValue;
             }
-            delete negativeValue;
 
             delete sheetRecepient;
             delete sheetsRecepient;
@@ -282,22 +282,22 @@ void Table::myVPR()
                 delete paste;
 
                 countDoingIterationForTime++;
-            }
 
-            if (colorChecked)
-            {
-                if (negativeValue->property("Value").toDouble() < 0)
+                if (colorChecked)
                 {
-                    // получаем указатель на её фон
-                    QAxObject* interior = negativeValue->querySubObject("Interior");
-                    // устанавливаем цвет
-                    interior->setProperty("Color", QColor("red"));
+                    if (negativeValue->property("Value").toDouble() < 0)
+                    {
+                        // получаем указатель на её фон
+                        QAxObject* interior = negativeValue->querySubObject("Interior");
+                        // устанавливаем цвет
+                        interior->setProperty("Color", QColor("red"));
 
-                    delete interior;
+                        delete interior;
+                    }
                 }
-            }
 
-            delete negativeValue;
+                delete negativeValue;
+            }
 
             delete sheetRecepient;
             delete sheetsRecepient;
