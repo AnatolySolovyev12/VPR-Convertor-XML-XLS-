@@ -1,4 +1,4 @@
-п»ї#pragma once
+#pragma once
 
 #include <QWidget>
 #include <QPushButton>
@@ -131,7 +131,7 @@ private:
     QCheckBox* colorCheck;
 
     
-    /* // РСЃРїРѕР»СЊР·РѕРІР°Р»СЃСЏ РІ СЂР°РЅРµРµРј РІР°СЂРёР°РЅС‚Рµ VPR. РР·РјРµРЅРµРЅРёСЏ РЅРµ РѕС‚СЂР°Р·РёР»РёСЃСЊ РЅР° СЃРєРѕСЂРѕСЃС‚Рё СЂР°Р±РѕС‚С‹ Р°Р»РіРѕСЂРёС‚РјР°
+    /* // Использовался в ранеем варианте VPR. Изменения не отразились на скорости работы алгоритма
     struct vprStruct
     {
         QVariant whatFindStruct;
