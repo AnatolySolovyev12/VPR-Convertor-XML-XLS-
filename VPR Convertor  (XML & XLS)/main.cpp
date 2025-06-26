@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
     Table window;
 
     window.resize(650, 450);
-    window.setWindowIcon(QIcon("icon.png"));
+    window.setWindowIcon(QIcon(QCoreApplication::applicationDirPath() + "\\icon.png"));
     window.setWindowTitle("VPR Convertor by Solovev");
     window.show();
 

@@ -934,7 +934,7 @@ void Table::readFileConfig()
 
 void Table::readDefaultFileConfig()
 {
-    QString filename = "config.txt";
+    QString filename = QCoreApplication::applicationDirPath() + "\\config.txt";
     QFile file(filename);
 
     if (!file.open(QIODevice::ReadOnly))
@@ -1115,7 +1115,7 @@ void Table::readDefaultFileConfig()
 
 void Table::writeCurrent()
 {
-    QString filename = "config.txt";
+    QString filename = QCoreApplication::applicationDirPath() + "\\config.txt";
     QFile file(filename);
 
     // Открываем файл в режиме "Только для записи"
